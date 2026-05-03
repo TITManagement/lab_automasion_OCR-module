@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -eu
+
+python3 .github/scripts/check_agents_governance.py
+python3 scripts/docs/normalize_readme.py --check --file README.md
+python3 scripts/ci/list_ci_generated_artifacts.py

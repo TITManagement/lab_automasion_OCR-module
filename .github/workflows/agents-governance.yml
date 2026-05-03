@@ -1,0 +1,25 @@
+name: Agents Governance
+
+on:
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - '.github/workflows/agents-governance.yml'
+      - '.github/scripts/check_agents_governance.py'
+  push:
+    branches: [main]
+    paths:
+      - 'AGENTS.md'
+      - '.github/workflows/agents-governance.yml'
+      - '.github/scripts/check_agents_governance.py'
+
+jobs:
+  validate-agents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate AGENTS.md
+        run: python .github/scripts/check_agents_governance.py
