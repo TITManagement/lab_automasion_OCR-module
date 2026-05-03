@@ -31,6 +31,7 @@ FENCE_PATTERN = re.compile(r"^\s*```")
 BOOK_TOC_SECTION_HEADING = "## 文書一冊化目次"
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TOC_FILE = PROJECT_ROOT / "README.md"
+OPTIONAL_POST_CLONE_TARGETS = ("PaddleOCR", "PaddleOCR/")
 
 
 @dataclass
@@ -293,10 +294,21 @@ def scan_broken_links(path: Path, docs_root: Path) -> list[dict[str, str]]:
 
             is_image = line[max(0, match.start() - 1) : match.start()] == "!"
             target_file = unquote(token.split("#", maxsplit=1)[0])
+            normalized_target = target_file.lstrip("./")
+            if any(
+                normalized_target == target.rstrip("/")
+                or normalized_target.startswith(target)
+                for target in OPTIONAL_POST_CLONE_TARGETS
+            ):
+                continue
             resolved = (path.parent / target_file).resolve()
+            try:
+                resolved.relative_to(docs_root.resolve().parent)
+            except ValueError:
+                # Links to the parent AiLab workspace are external references in a standalone clone.
+                continue
             if not resolved.exists():
                 # Fallback for project docs that use docs-root-relative links.
-                normalized_target = target_file.lstrip("./")
                 resolved = (docs_root / normalized_target).resolve()
 
             if not resolved.exists():
