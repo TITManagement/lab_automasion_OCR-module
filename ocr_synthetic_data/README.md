@@ -63,6 +63,22 @@ python -c "import ocr_synthetic_data; print(ocr_synthetic_data.__version__)"
 | [src/ocr_synthetic_data/generate_variants.py](src/ocr_synthetic_data/generate_variants.py) | case から synthetic variants を生成 |
 | [src/ocr_synthetic_data/export_paddleocr_dataset.py](src/ocr_synthetic_data/export_paddleocr_dataset.py) | PaddleOCR 学習形式への export |
 
+## Evaluation Case
+
+synthetic data の種となる元画像、正解テキスト、ROI 定義は [tests/evaluation/cases](tests/evaluation/cases/) に保存します。
+
+例:
+
+```text
+tests/evaluation/cases/img_0678/
+├── source.jpg
+├── expected.txt
+├── expected_fields.json
+└── rois.json
+```
+
+`variants/` は生成物のため git 管理対象外です。
+
 ## 開発者向け情報
 
 このパッケージは synthetic data 生成までを責務とし、PaddleOCR 本体の学習実行は扱いません。
