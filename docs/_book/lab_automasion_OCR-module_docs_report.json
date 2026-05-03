@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-05-03T18:26:26.071173",
+  "docs_root": "/Users/tinoue/Development.local/app/AiLab/lab_automation_module/lab_automasion_OCR-module/docs",
+  "toc_file": "/Users/tinoue/Development.local/app/AiLab/lab_automation_module/lab_automasion_OCR-module/README.md",
+  "chapter_count": 3,
+  "chapters": [
+    "README.md",
+    "ocr_support_algorithm_design.md",
+    "dev/notes/DEVELOPER_GUIDE.md"
+  ],
+  "duplicate_chapters": [
+    "dev/notes/DEVELOPER_GUIDE.md",
+    "ocr_support_algorithm_design.md"
+  ],
+  "missing_chapters": [],
+  "orphan_markdown_files": [
+    "devops/CI_GENERATED_ARTIFACTS.md"
+  ],
+  "broken_links": [],
+  "warnings": [],
+  "outputs": {
+    "combined_markdown": "/Users/tinoue/Development.local/app/AiLab/lab_automation_module/lab_automasion_OCR-module/docs/_book/lab_automasion_OCR-module_docs_book.md",
+    "report_json": "/Users/tinoue/Development.local/app/AiLab/lab_automation_module/lab_automasion_OCR-module/docs/_book/lab_automasion_OCR-module_docs_report.json"
+  },
+  "success": true
+}
