@@ -31,7 +31,7 @@ FENCE_PATTERN = re.compile(r"^\s*```")
 BOOK_TOC_SECTION_HEADING = "## 文書一冊化目次"
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TOC_FILE = PROJECT_ROOT / "README.md"
-OPTIONAL_POST_CLONE_TARGETS = ("PaddleOCR", "PaddleOCR/")
+OPTIONAL_POST_CLONE_TARGETS = ("vendor/PaddleOCR", "vendor/PaddleOCR/")
 
 
 @dataclass

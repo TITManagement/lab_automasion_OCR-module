@@ -1,5 +1,5 @@
-timestamp_utc=2026-05-02T15:59:07Z
-repo=../../../PaddleOCR
+timestamp_utc=2026-05-03T13:38:33Z
+repo=../../vendor/PaddleOCR
 remote=https://github.com/PaddlePaddle/PaddleOCR.git
 branch=main
 commit=f8b41a62bba991d35e578ffa712107a042b0c3b0

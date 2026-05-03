@@ -24,18 +24,18 @@
 
 ## モジュール固有ルール
 
-- [PaddleOCR](PaddleOCR/) は upstream/vendor 本体として扱い、原則として直接修正しない。
+- [vendor/PaddleOCR](vendor/PaddleOCR/) は upstream/vendor 本体として扱い、原則として直接修正しない。
 - OCRの起動、GUI、カメラ入力、ログ整形、前処理、後処理、モデル選択、オフライン運用の調整は、原則として以下の外側レイヤーに閉じる。
   - [main.py](main.py)
   - [ocr_wrapper](ocr_wrapper/)
   - [_post_clone_assets/security_ops](_post_clone_assets/security_ops/)
-- [PaddleOCR](PaddleOCR/) 配下を変更する必要が出た場合は、先に理由、代替不能性、upstream更新時の影響、復旧手順を明文化し、ユーザー確認を得てから実施する。
-- `PaddleOCR/.venv_*`、モデルキャッシュ、`__pycache__`、一時画像、OCR出力の一時ファイルは生成物として扱い、コミット対象に含めない。
+- [vendor/PaddleOCR](vendor/PaddleOCR/) 配下を変更する必要が出た場合は、先に理由、代替不能性、upstream更新時の影響、復旧手順を明文化し、ユーザー確認を得てから実施する。
+- `.venv_OCR`、`vendor/PaddleOCR/.venv_*`、モデルキャッシュ、`__pycache__`、一時画像、OCR出力の一時ファイルは生成物として扱い、コミット対象に含めない。
 
 ## 実行エントリ
 
 - 通常の起動入口は [main.py](main.py) とする。
-- `python main.py camera-ocr-gui` は [ocr_wrapper/src/ocr_wrapper/camera_ocr_gui.py](ocr_wrapper/src/ocr_wrapper/camera_ocr_gui.py) を、[PaddleOCR](PaddleOCR/) 配下の `.venv_paddleocr311/bin/python` で起動する。
+- `python main.py camera-ocr-gui` は [ocr_wrapper/src/ocr_wrapper/camera_ocr_gui.py](ocr_wrapper/src/ocr_wrapper/camera_ocr_gui.py) を、プロジェクト直下の [.venv_OCR](.venv_OCR/) で起動する。
 - PaddleOCR CLIの直接実行は、原則 [_post_clone_assets/security_ops/scripts/run_paddleocr_offline.sh](_post_clone_assets/security_ops/scripts/run_paddleocr_offline.sh) 経由とする。
 
 ## OCR GUI運用

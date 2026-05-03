@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 BASE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-REPO_RELATIVE_PATH="../../../PaddleOCR"
-REPO_DIR="$BASE_DIR/../../PaddleOCR"
+REPO_RELATIVE_PATH="../../vendor/PaddleOCR"
+REPO_DIR="$BASE_DIR/../../vendor/PaddleOCR"
 OUT="$BASE_DIR/reports/source_baseline.txt"
 mkdir -p "$(dirname "$OUT")"
 {

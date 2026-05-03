@@ -22,14 +22,14 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 
 この README は、[ocr_wrapper](.) 配下だけを対象にした Python パッケージ保守用の開発者向け説明です。
 
-モジュール全体の初回セットアップ、利用開始、PaddleOCR clone 方針、CI の入口は [../README.md](../README.md) を正本とします。この README では、[ocr_wrapper](.) 配下の責務分割、直接実行、回帰テストだけを扱います。
+モジュール全体の初回セットアップ、利用開始、PaddleOCR vendor clone 方針、CI の入口は [../README.md](../README.md) を正本とします。この README では、[ocr_wrapper](.) 配下の責務分割、直接実行、回帰テストだけを扱います。
 
 ## README の責務境界
 
 | README | 扱う内容 | 扱わない内容 |
 | --- | --- | --- |
-| [../README.md](../README.md) | [../PaddleOCR](../PaddleOCR/) を含めたモジュール全体の概要、セットアップ、利用開始、PaddleOCR の配置と扱い、CI と運用方針 | wrapper 内部関数の詳細、補正アルゴリズムの詳細 |
-| [README.md](README.md) | [ocr_wrapper](.) 配下に閉じた Python パッケージ構成、各 Python モジュールの責務、開発者向け直接実行、回帰テスト | モジュール全体の導入方針、PaddleOCR clone 方針、文書全体の索引 |
+| [../README.md](../README.md) | [../vendor/PaddleOCR](../vendor/PaddleOCR/) を含めたモジュール全体の概要、セットアップ、利用開始、PaddleOCR の配置と扱い、CI と運用方針 | wrapper 内部関数の詳細、補正アルゴリズムの詳細 |
+| [README.md](README.md) | [ocr_wrapper](.) 配下に閉じた Python パッケージ構成、各 Python モジュールの責務、開発者向け直接実行、回帰テスト | モジュール全体の導入方針、PaddleOCR vendor clone 方針、文書全体の索引 |
 | [../docs/ocr_support_algorithm_design.md](../docs/ocr_support_algorithm_design.md) | OCR 補助アルゴリズムの設計 | Python パッケージ構成や実行コマンド一覧 |
 
 ## 対象者
@@ -40,7 +40,7 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 
 ## 方針
 
-- [../PaddleOCR](../PaddleOCR/) は編集しない
+- [../vendor/PaddleOCR](../vendor/PaddleOCR/) は編集しない
 - このラッパーから `paddleocr` CLI を呼び出す
 - 回帰テストは golden JSON 比較で行う
 - GUI、画像処理、OCR 実行、テキスト補正の責務を分ける
@@ -59,7 +59,7 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 ## 依存関係
 
 - Python 3.11 系
-- [../PaddleOCR](../PaddleOCR/) に作成済みの PaddleOCR 実行用仮想環境
+- プロジェクト直下の [../.venv_OCR](../.venv_OCR/) に作成済みの OCR 実行用仮想環境
 - `opencv-python`
 - `Pillow`
 - `customtkinter`
@@ -71,13 +71,12 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 
 通常の初回セットアップは [../README.md](../README.md) を参照してください。
 
-wrapper を直接確認する場合は、モジュールルートで作成済みの PaddleOCR 実行用仮想環境を有効化します。以下はモジュールルートから実行する例です。PaddleOCR の配置や仮想環境作成は [../README.md](../README.md) の責務です。
+wrapper を直接確認する場合は、モジュールルートで作成済みの OCR 実行用仮想環境を有効化します。以下はモジュールルートから実行する例です。PaddleOCR の vendor 配置や仮想環境作成は [../README.md](../README.md) の責務です。
 
 ```bash
 # 必要な環境のみ:
 # export PIP_CONFIG_FILE="./pip.conf"
-cd PaddleOCR
-source .venv_paddleocr311/bin/activate
+source .venv_OCR/bin/activate
 ```
 
 ## 単発OCR実行

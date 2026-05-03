@@ -14,7 +14,7 @@
 
 ## 概要
 
-対象: [PaddleOCR](../../PaddleOCR/)
+対象: [../../vendor/PaddleOCR](../../vendor/PaddleOCR/)
 
 - 取得したソースの版固定
 - Python依存の固定化
@@ -29,7 +29,7 @@
 
 ## 依存
 
-- [PaddleOCR](../../PaddleOCR/) のローカルクローン
+- [../../vendor/PaddleOCR](../../vendor/PaddleOCR/) のローカルクローン
 - `pip-audit`
 - CycloneDX SBOM 出力に必要な Python パッケージ
 - 閉鎖ネットワーク搬入用 wheelhouse を作成できる Python 仮想環境

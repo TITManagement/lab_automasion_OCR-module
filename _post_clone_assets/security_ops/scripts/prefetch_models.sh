@@ -14,14 +14,15 @@ set -euo pipefail
 #   --dry-run       Show what would be downloaded without executing
 #
 # Environment overrides:
-#   PADDLEOCR_PYTHON_BIN    Python binary (default: <PaddleOCR>/.venv_paddleocr311/bin/python)
+#   PADDLEOCR_PYTHON_BIN    Python binary (default: <project_root>/.venv_OCR/bin/python)
 #   PADDLEOCR_MODEL_CACHE_DIR  Model cache directory
 #   PADDLE_PDX_MODEL_SOURCE    Download source
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PADDLEOCR_ROOT="$(cd -- "${SCRIPT_DIR}/../../../PaddleOCR" && pwd)"
+PADDLEOCR_ROOT="$(cd -- "${SCRIPT_DIR}/../../../vendor/PaddleOCR" && pwd)"
+PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 
-PYTHON_BIN="${PADDLEOCR_PYTHON_BIN:-${PADDLEOCR_ROOT}/.venv_paddleocr311/bin/python}"
+PYTHON_BIN="${PADDLEOCR_PYTHON_BIN:-${PROJECT_ROOT}/.venv_OCR/bin/python}"
 MODEL_SOURCE="${PADDLE_PDX_MODEL_SOURCE:-modelscope}"
 CACHE_DIR="${PADDLEOCR_MODEL_CACHE_DIR:-${HOME}/.paddlex/official_models}"
 DRY_RUN=0
@@ -59,9 +60,9 @@ echo ""
 if [[ ! -x "${PYTHON_BIN}" ]]; then
   echo "[ERROR] Python executable not found: ${PYTHON_BIN}" >&2
   echo "        Create the venv first:" >&2
-  echo "          python3.11 -m venv ${PADDLEOCR_ROOT}/.venv_paddleocr311" >&2
-  echo "          ${PADDLEOCR_ROOT}/.venv_paddleocr311/bin/pip install paddlepaddle==3.1.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/" >&2
-  echo "          ${PADDLEOCR_ROOT}/.venv_paddleocr311/bin/pip install -e ${PADDLEOCR_ROOT}" >&2
+  echo "          python3.11 -m venv ${PROJECT_ROOT}/.venv_OCR" >&2
+  echo "          ${PROJECT_ROOT}/.venv_OCR/bin/pip install paddlepaddle==3.1.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/" >&2
+  echo "          ${PROJECT_ROOT}/.venv_OCR/bin/pip install -e ${PADDLEOCR_ROOT}" >&2
   exit 2
 fi
 

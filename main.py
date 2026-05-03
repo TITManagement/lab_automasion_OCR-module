@@ -16,7 +16,7 @@ def main() -> int:
     wrapper = module_root / "_post_clone_assets" / "security_ops" / "scripts" / "run_paddleocr_offline.sh"
     camera_app = module_root / "ocr_wrapper" / "src" / "ocr_wrapper" / "camera_ocr.py"
     camera_gui_app = module_root / "ocr_wrapper" / "src" / "ocr_wrapper" / "camera_ocr_gui.py"
-    paddle_python = module_root / "PaddleOCR" / ".venv_paddleocr311" / "bin" / "python"
+    paddle_python = module_root / ".venv_OCR" / "bin" / "python"
 
     if not wrapper.exists():
         print(f"[ERROR] wrapper not found: {wrapper}", file=sys.stderr)

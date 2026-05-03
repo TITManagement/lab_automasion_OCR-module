@@ -14,7 +14,7 @@
 
 ## 概要
 
-このディレクトリ配下は、[PaddleOCR](../PaddleOCR/) クローン後にローカルで追加した運用資材です。
+このディレクトリ配下は、[../vendor/PaddleOCR](../vendor/PaddleOCR/) クローン後にローカルで追加した運用資材です。
 
 ## 使い方
 
@@ -22,7 +22,7 @@
 
 ## 依存
 
-- [PaddleOCR](../PaddleOCR/) のローカルクローン
+- [../vendor/PaddleOCR](../vendor/PaddleOCR/) のローカルクローン
 - セキュリティ監査・オフライン運用に必要な Python 仮想環境
 
 ## 配置

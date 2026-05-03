@@ -1,5 +1,5 @@
 # Upstream/vendor checkout. Keep acquisition documented, but do not commit it here.
-PaddleOCR/
+vendor/PaddleOCR/
 
 # Python caches and virtual environments
 __pycache__/
@@ -14,7 +14,7 @@ env/
 *.temp
 *.log
 ocr_wrapper/tests/output/
-ocr_synthetic_data/datasets/source_cases/*/variants/
+ocr_dataset/source_cases/*/variants/
 
 # Security/offline generated heavy artifacts
 _post_clone_assets/security_ops/reports/wheelhouse/

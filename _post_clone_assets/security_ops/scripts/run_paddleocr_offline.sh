@@ -17,14 +17,15 @@ if [[ $# -eq 0 ]]; then
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PADDLEOCR_ROOT="$(cd -- "${SCRIPT_DIR}/../../../PaddleOCR" && pwd)"
+PADDLEOCR_ROOT="$(cd -- "${SCRIPT_DIR}/../../../vendor/PaddleOCR" && pwd)"
+PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 
 # Prefer Python 3.11 security-maintained venv. Fallback can be overridden.
-PYTHON_BIN="${PADDLEOCR_PYTHON_BIN:-${PADDLEOCR_ROOT}/.venv_paddleocr311/bin/python}"
+PYTHON_BIN="${PADDLEOCR_PYTHON_BIN:-${PROJECT_ROOT}/.venv_OCR/bin/python}"
 
 if [[ ! -x "${PYTHON_BIN}" ]]; then
   echo "[ERROR] Python executable not found: ${PYTHON_BIN}" >&2
-  echo "        Create venv first, e.g. ${PADDLEOCR_ROOT}/.venv_paddleocr311" >&2
+  echo "        Create venv first, e.g. python3.11 -m venv ${PROJECT_ROOT}/.venv_OCR" >&2
   exit 2
 fi
 

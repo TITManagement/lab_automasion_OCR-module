@@ -40,7 +40,7 @@ try:
 except ModuleNotFoundError as exc:
     raise SystemExit(
         "[ERROR] customtkinter is not installed. "
-        "Install with: PaddleOCR/.venv_paddleocr311/bin/pip install customtkinter"
+        "Install with: .venv_OCR/bin/pip install customtkinter"
     ) from exc
 
 
