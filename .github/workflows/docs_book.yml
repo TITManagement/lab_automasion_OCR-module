@@ -15,11 +15,10 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - '!docs/_book/**'
       - 'README.md'
       - 'scripts/docs/**'
       - '.github/workflows/docs_book.yml'
-    paths-ignore:
-      - 'docs/_book/**'
 
 permissions:
   contents: write

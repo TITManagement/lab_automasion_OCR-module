@@ -1,5 +1,8 @@
 # AGENTS.md (lab_automasion_OCR-module Local)
 
+<!-- AGENTS_BASE_SOURCE: ../../AGENTS.md -->
+<!-- AGENTS_BASE_SHA256: local-delta -->
+
 | 項目 | 内容 |
 | --- | --- |
 | 文書ID | `LABOCR-OPS-AGENTS-GUIDE` |
