@@ -1,3 +1,14 @@
+"""OpenCV preview loop for running PaddleOCR from a physical camera.
+
+責務:
+    - カメラフレームを取得し、簡易プレビューを表示する。
+    - offline wrapper 経由で単発 OCR を実行する。
+    - GUI 版と同じ OCR 出力パーサを利用して結果表示を揃える。
+
+責務外:
+    - OCR 結果の補正や GUI 用 ROI 操作は扱わない。
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -17,6 +28,7 @@ except ModuleNotFoundError:
 
 
 def _run_ocr(wrapper: Path, image_path: Path, lang: str) -> tuple[int, str]:
+    """offline wrapper を呼び出し、stdout/stderr を後段で解析できる形に結合する。"""
     cmd = ["bash", str(wrapper), "ocr", "-i", str(image_path), "--lang", lang]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     merged = (proc.stdout or "") + "\n" + (proc.stderr or "")
@@ -24,6 +36,7 @@ def _run_ocr(wrapper: Path, image_path: Path, lang: str) -> tuple[int, str]:
 
 
 def main() -> int:
+    """カメラプレビューを起動し、周期実行またはキー操作で OCR を実行する。"""
     parser = argparse.ArgumentParser(description="Camera OCR app (webcam/UVC) via offline paddleocr wrapper.")
     parser.add_argument("--camera-index", type=int, default=0)
     parser.add_argument("--lang", default="japan")

@@ -1,3 +1,15 @@
+"""CustomTkinter Camera OCR GUI for PaddleOCR wrapper operation.
+
+責務:
+    - カメラ取得画像と ROI 抽出画像を同時にプレビューする。
+    - マウスドラッグで ROI を指定し、OCR 対象フレームを決める。
+    - PaddleOCR の実行を worker thread へ逃がし、GUI を固着させない。
+    - Raw OCR と Corrected OCR、整形済み実行ログを表示する。
+
+責務外:
+    - OCR 文字列補正、画像前処理、PaddleOCR CLI 引数の詳細は専用モジュールへ委譲する。
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -33,6 +45,8 @@ except ModuleNotFoundError as exc:
 
 
 class CameraOCRGui(ctk.CTk):
+    """カメラプレビュー、ROI選択、非同期OCR実行を束ねる GUI アプリケーション。"""
+
     def __init__(self, camera_index: int, lang: str, ocr_version: str):
         super().__init__()
         self.title("Camera OCR")
@@ -158,6 +172,7 @@ class CameraOCRGui(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def on_camera_selected(self, value: str) -> None:
+        """選択されたカメラ index へ切り替え、稼働中ならプレビューを再開する。"""
         try:
             selected = int(value)
         except ValueError:
@@ -171,6 +186,7 @@ class CameraOCRGui(ctk.CTk):
             self.start_camera()
 
     def on_roi_preset_selected(self, value: str) -> None:
+        """プリセット名から相対 ROI を設定し、現在フレームへ反映する。"""
         presets = {
             "Center": (0.15, 0.12, 0.85, 0.82),
             "Full": (0.0, 0.0, 1.0, 1.0),
@@ -189,6 +205,7 @@ class CameraOCRGui(ctk.CTk):
             self._render_preview_frame(self.current_frame)
 
     def _current_roi(self) -> tuple[float, float, float, float]:
+        """GUI 変数上の ROI を正規化し、最小サイズを満たす相対座標として返す。"""
         left = max(0.0, min(1.0, self.roi_left.get()))
         top = max(0.0, min(1.0, self.roi_top.get()))
         right = max(0.0, min(1.0, self.roi_right.get()))
@@ -238,6 +255,7 @@ class CameraOCRGui(ctk.CTk):
         self._refresh_preview()
 
     def _preview_event_to_roi_point(self, event: tk.Event) -> tuple[float, float] | None:
+        """黒帯を除いた実画像表示領域のマウス座標を ROI 相対座標へ変換する。"""
         if self.preview_image_rect is None:
             return None
         left, top, right, bottom = self.preview_image_rect
@@ -254,6 +272,7 @@ class CameraOCRGui(ctk.CTk):
         self.roi_bottom.set(max(start[1], end[1]))
 
     def start_camera(self) -> None:
+        """実機カメラを開き、取得フレームのプレビュー更新ループを開始する。"""
         if self.is_closing:
             return
         if self.cap is not None and self.cap.isOpened():
@@ -270,6 +289,7 @@ class CameraOCRGui(ctk.CTk):
         self._update_preview()
 
     def stop_camera(self) -> None:
+        """プレビュー更新を止め、カメラデバイスと表示画像の参照を解放する。"""
         if self.preview_after_id is not None:
             try:
                 self.after_cancel(self.preview_after_id)
@@ -311,6 +331,7 @@ class CameraOCRGui(ctk.CTk):
         self._render_preview_frame(self.current_frame)
 
     def _render_preview_frame(self, frame) -> None:
+        """アスペクト比を維持した Camera/ROI プレビュー画像を生成して表示する。"""
         frame_height, frame_width = frame.shape[:2]
         if frame_width <= 0 or frame_height <= 0:
             return
@@ -343,6 +364,7 @@ class CameraOCRGui(ctk.CTk):
             return
 
     def _frame_to_canvas(self, frame, widget: tk.Label) -> tuple[Image.Image, tuple[int, int], tuple[int, int]]:
+        """フレームをウィジェットサイズの黒背景キャンバスへ letterbox 表示する。"""
         preview_width = widget.winfo_width()
         preview_height = widget.winfo_height()
         if preview_width <= 2 or preview_height <= 2:
@@ -378,6 +400,7 @@ class CameraOCRGui(ctk.CTk):
                     pixels[right - offset - 1, y] = color
 
     def _pause_preview_for_ocr(self) -> None:
+        """OCR 実行中に同じフレームを扱うため、プレビュー更新だけを一時停止する。"""
         self.preview_paused_for_ocr = True
         if self.preview_after_id is not None:
             try:
@@ -387,6 +410,7 @@ class CameraOCRGui(ctk.CTk):
             self.preview_after_id = None
 
     def _resume_preview_after_ocr(self) -> None:
+        """OCR 終了後、カメラが開いていればプレビュー更新を再開する。"""
         self.preview_paused_for_ocr = False
         if self.is_closing or self.cap is None or not self.cap.isOpened():
             return
@@ -394,6 +418,7 @@ class CameraOCRGui(ctk.CTk):
             self._update_preview()
 
     def run_ocr(self) -> None:
+        """現在フレームを一時画像化し、通常パスと英数字補助パスの OCR を開始する。"""
         if self.ocr_process is not None:
             self.status.configure(text="OCR already running")
             return
@@ -427,6 +452,7 @@ class CameraOCRGui(ctk.CTk):
         self._poll_ocr()
 
     def _run_ocr_worker(self, commands: list[tuple[str, list[str]]]) -> None:
+        """PaddleOCR subprocess を worker thread で順番に実行し、結果を queue へ渡す。"""
         try:
             combined_stdout: list[str] = []
             combined_stderr: list[str] = []
@@ -448,6 +474,7 @@ class CameraOCRGui(ctk.CTk):
             self.ocr_queue.put(("error", exc))
 
     def _poll_ocr(self) -> None:
+        """worker thread からの OCR 進捗と完了通知を Tk event loop 上で処理する。"""
         while True:
             try:
                 event, payload = self.ocr_queue.get_nowait()
@@ -473,6 +500,7 @@ class CameraOCRGui(ctk.CTk):
             self.ocr_after_id = self.after(1000, self._poll_ocr)
 
     def _finish_ocr(self, returncode: int, stdout: str, stderr: str) -> None:
+        """一時ファイルを片付け、OCR結果・ログ・ステータスを GUI に反映する。"""
         if self.ocr_after_id is not None:
             try:
                 self.after_cancel(self.ocr_after_id)
@@ -511,6 +539,7 @@ class CameraOCRGui(ctk.CTk):
             self.raw_result_box.insert("1.0", "(OCR failed)")
 
     def on_close(self) -> None:
+        """ウィンドウ終了時に OCR process、after callback、カメラを順に解放する。"""
         self.is_closing = True
         if self.ocr_process is not None:
             self.ocr_process.terminate()
@@ -528,6 +557,7 @@ class CameraOCRGui(ctk.CTk):
 
 
 def main() -> int:
+    """Camera OCR GUI の CLI 引数を読み取り、CustomTkinter アプリを起動する。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--camera-index", type=int, default=0)
     parser.add_argument("--lang", default="japan")

@@ -15,6 +15,7 @@
 - 共通ルール: [../../AGENTS.md](../../AGENTS.md)
 - リポジトリ差分ルール: [../AGENTS.md](../AGENTS.md)
 - README標準: [../../README_STANDARD.md](../../README_STANDARD.md)
+- docstring / comment 規約: [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md)
 
 このファイルには、`lab_automasion_OCR-module` 固有の差分だけを書く。
 
@@ -52,3 +53,11 @@
 - 実行ログは、利用者が判断しやすい形に整形する。ANSI制御文字、既知のノイズ、長いキャッシュパスは必要に応じて簡略化する。
 - OCR結果の後処理では、表示改善と認識値の置換を分けて扱う。
 - 認識値を辞書補正やルール補正で置換する場合は、補正ルール、対象フィールド、誤補正リスクを明記する。
+
+## Docstring / Comment
+
+- Python ソースの docstring / comment は [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md) を正本とする。
+- `__init__.py` を除く `.py` ファイルには module docstring を置く。
+- public class / public function は役割を先に書き、必要に応じて返り値、副作用、前提を補う。
+- private helper は、外部 I/O、例外吸収、状態変換、payload 整形、並行処理境界など、責務境界上重要なものを優先して書く。
+- getter / setter 相当の自明な関数には、名前の焼き直しになる docstring を書かない。

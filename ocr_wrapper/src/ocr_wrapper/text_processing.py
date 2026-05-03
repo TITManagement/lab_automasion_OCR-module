@@ -1,3 +1,14 @@
+"""OCR text parsing and post-processing rules.
+
+責務:
+    - PaddleOCR の stdout から `rec_texts` を抽出する。
+    - Raw OCR と Corrected OCR を比較可能な表示 payload に整形する。
+    - 郵便番号、TEL/FAX、URL、英数字記号列、mojibake を安全寄りに補正する。
+
+責務外:
+    - 画像前処理、PaddleOCR プロセス実行、GUI 状態管理は扱わない。
+"""
+
 from __future__ import annotations
 
 import ast
@@ -5,6 +16,14 @@ import re
 
 
 def parse_rec_texts(stdout: str) -> list[str]:
+    """PaddleOCR の標準出力から複数パス分の `rec_texts` を順序保持で抽出する。
+
+    Args:
+        stdout: PaddleOCR CLI の stdout/stderr 結合文字列。
+
+    Returns:
+        Unicode 表現を表示用に戻し、重複を除いた認識文字列リスト。
+    """
     matches = re.findall(r"'rec_texts':\s*\[(.*?)\]", stdout, flags=re.DOTALL)
     if not matches:
         return []
@@ -19,6 +38,7 @@ def parse_rec_texts(stdout: str) -> list[str]:
 
 
 def dedupe_texts(texts: list[str]) -> list[str]:
+    """OCR の検出順を保ったまま、同一文字列の重複だけを取り除く。"""
     seen: set[str] = set()
     unique: list[str] = []
     for text in texts:
@@ -30,6 +50,15 @@ def dedupe_texts(texts: list[str]) -> list[str]:
 
 
 def build_result_sections(texts: list[str], correction_mode: str = "Auto") -> tuple[str, str]:
+    """Raw OCR と Corrected OCR の表示 payload を同じ入力から生成する。
+
+    Args:
+        texts: PaddleOCR から抽出済みの認識文字列。
+        correction_mode: `Auto`, `Off`, `Basic`, `Context` のいずれか。
+
+    Returns:
+        `(corrected_text, raw_text)` の表示用文字列。
+    """
     serials = _serial_like_texts(texts)
     serial_set = set(serials)
     raw_ordered = serials + [
@@ -51,6 +80,7 @@ def build_result_sections(texts: list[str], correction_mode: str = "Auto") -> tu
 
 
 def normalize_result_text(text: str) -> str:
+    """PaddleOCR 出力中のリテラル Unicode 表現を表示可能な文字へ戻す。"""
     if "\\u" in text:
         try:
             text = text.encode("utf-8").decode("unicode_escape")
@@ -96,6 +126,7 @@ def _filter_serial_candidate(text: str) -> str:
 
 
 def _auto_correction_mode(lines: list[str]) -> str:
+    """Context 補正が効きやすい既知マーカーがある場合だけ補正強度を上げる。"""
     basic_lines = _normalize_basic_texts(lines)
     joined_raw = "\n".join(lines)
     joined_basic = "\n".join(basic_lines)
@@ -136,6 +167,7 @@ def _normalize_context_texts(texts: list[str]) -> list[str]:
 
 
 def _apply_known_facility_corrections(lines: list[str]) -> list[str]:
+    """URL 等で文脈が特定できる場合だけ、施設固有の高リスク補正を適用する。"""
     if not any("toride-medical" in line for line in lines):
         return lines
     corrected: list[str] = []
@@ -152,6 +184,7 @@ def _apply_known_facility_corrections(lines: list[str]) -> list[str]:
 
 
 def _normalize_basic_line(line: str) -> str:
+    """文書種別に依存しにくい形式補正だけを 1 行へ適用する。"""
     line = line.strip()
     if not line:
         return ""
@@ -173,6 +206,7 @@ def _normalize_basic_line(line: str) -> str:
 
 
 def _normalize_context_line(line: str) -> str:
+    """Basic 補正に加え、文脈上の典型誤認識を 1 行へ適用する。"""
     line = line.strip()
     if not line:
         return ""
@@ -222,6 +256,7 @@ def _looks_like_phone_line(line: str) -> bool:
 
 
 def _normalize_phone_line(line: str) -> str:
+    """電話/FAX らしい行にだけ whitelist 相当のラベル・記号補正を適用する。"""
     line = line.translate(str.maketrans({
         "Ａ": "A",
         "ｘ": "x",
@@ -250,6 +285,7 @@ def _looks_like_url_line(line: str) -> bool:
 
 
 def _normalize_url_line(line: str) -> str:
+    """URL らしい行にだけ scheme、ドメイン、記号の崩れを補正する。"""
     line = line.translate(str.maketrans({
         "Ｕ": "U",
         "Ｒ": "R",
@@ -322,6 +358,7 @@ def _looks_like_mojibake(text: str) -> bool:
 
 
 def _maybe_fix_mojibake(text: str) -> str:
+    """復元後に日本語が増える場合だけ Latin-1 化けした UTF-8 文字列を戻す。"""
     if not _looks_like_mojibake(text):
         return text
     fixed = _decode_latin1_utf8_mojibake(text)
@@ -333,6 +370,7 @@ def _maybe_fix_mojibake(text: str) -> str:
 
 
 def _decode_latin1_utf8_mojibake(text: str) -> str | None:
+    """全角空白などが混在する行でも、復元可能な Latin-1 区間だけを試す。"""
     try:
         return text.encode("latin1").decode("utf-8")
     except UnicodeError:

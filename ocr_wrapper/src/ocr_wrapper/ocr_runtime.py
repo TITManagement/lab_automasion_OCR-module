@@ -1,3 +1,14 @@
+"""Runtime helpers for invoking PaddleOCR through the offline wrapper.
+
+責務:
+    - GUI/CLI から使う PaddleOCR コマンドラインを一貫して組み立てる。
+    - PaddleOCR の冗長なログを利用者向けに圧縮する。
+    - 終了コードを GUI 表示しやすい文字列へ変換する。
+
+責務外:
+    - subprocess のライフサイクル管理や OCR 結果の文字列補正は扱わない。
+"""
+
 from __future__ import annotations
 
 import re
@@ -6,6 +17,17 @@ from pathlib import Path
 
 
 def build_ocr_cmd(wrapper: Path, image_path: Path, lang: str, ocr_version: str) -> list[str]:
+    """macOS CPU で安定しやすい PaddleOCR CLI 引数を組み立てる。
+
+    Args:
+        wrapper: offline-first 実行を担う shell wrapper。
+        image_path: OCR 対象画像。
+        lang: PaddleOCR の言語指定。
+        ocr_version: `PP-OCRv3` などのモデル世代指定。
+
+    Returns:
+        `subprocess` へ渡せるコマンド配列。
+    """
     return [
         "bash",
         str(wrapper),
@@ -34,6 +56,14 @@ def build_ocr_cmd(wrapper: Path, image_path: Path, lang: str, ocr_version: str) 
 
 
 def clean_log_text(text: str) -> str:
+    """PaddleOCR の実行ログから GUI 判断を妨げる既知ノイズを取り除く。
+
+    Args:
+        text: stdout と stderr を結合したログ文字列。
+
+    Returns:
+        ANSI 制御文字、ccache 警告、長いモデルキャッシュパスなどを整形した表示用ログ。
+    """
     ansi_escape = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
     cleaned = ansi_escape.sub("", text)
     cleaned = cleaned.replace("\r", "\n")
@@ -69,6 +99,7 @@ def clean_log_text(text: str) -> str:
 
 
 def describe_returncode(returncode: int) -> str:
+    """負の終了コードを signal 名付きで表示できる文字列へ変換する。"""
     if returncode >= 0:
         return str(returncode)
     signal_number = -returncode
