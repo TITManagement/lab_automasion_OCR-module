@@ -3,15 +3,19 @@ requires = ["setuptools>=61", "packaging>=23"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "project-template"
+name = "lab-automasion-ocr-module"
 version = "0.1.0"
-description = "AiLab standard project template"
+description = "Non-invasive Camera OCR wrapper for PaddleOCR"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 authors = [{ name = "Takaya Inoue" }]
 maintainers = [{ name = "AUTO Kobo headquarters" }]
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+  "customtkinter",
+  "opencv-python",
+  "Pillow",
+]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
@@ -19,19 +23,21 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/TITManagement/project_template"
-Repository = "https://github.com/TITManagement/project_template"
-Documentation = "https://github.com/TITManagement/project_template#readme"
+Homepage = "https://github.com/TITManagement/lab_automasion_OCR-module"
+Repository = "https://github.com/TITManagement/lab_automasion_OCR-module"
+Documentation = "https://github.com/TITManagement/lab_automasion_OCR-module#readme"
 
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.6", "mypy>=1.8"]
 
 [project.scripts]
-project-template = "src.app:main"
+lab-ocr = "ocr_wrapper.run_ocr:main"
+lab-camera-ocr = "ocr_wrapper.camera_ocr:main"
+lab-camera-ocr-gui = "ocr_wrapper.camera_ocr_gui:main"
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["src"]
+where = ["ocr_wrapper/src"]
+include = ["ocr_wrapper*"]
 
 [tool.metadata]
 copyright = "AUTO kobo"

@@ -1,6 +1,25 @@
-.venv/
+# Upstream/vendor checkout. Keep acquisition documented, but do not commit it here.
+PaddleOCR/
+
+# Python caches and virtual environments
 __pycache__/
-*.pyc
-.DS_Store
+*.py[cod]
 *.egg-info/
+.venv*/
+venv/
+env/
+
+# Local OCR/runtime outputs
+*.tmp
+*.temp
+*.log
+ocr_wrapper/tests/output/
+
+# Security/offline generated heavy artifacts
+_post_clone_assets/security_ops/reports/wheelhouse/
 ops/ci/artifacts/
+
+# Local OS/editor files
+.DS_Store
+.idea/
+.vscode/
