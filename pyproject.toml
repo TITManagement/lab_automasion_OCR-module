@@ -34,10 +34,11 @@ dev = ["pytest>=7", "ruff>=0.6", "mypy>=1.8"]
 lab-ocr = "ocr_wrapper.run_ocr:main"
 lab-camera-ocr = "ocr_wrapper.camera_ocr:main"
 lab-camera-ocr-gui = "ocr_wrapper.camera_ocr_gui:main"
+lab-ocr-generate-variants = "ocr_synthetic_data.generate_variants:main"
 
 [tool.setuptools.packages.find]
-where = ["ocr_wrapper/src"]
-include = ["ocr_wrapper*"]
+where = ["ocr_wrapper/src", "ocr_synthetic_data/src"]
+include = ["ocr_wrapper*", "ocr_synthetic_data*"]
 
 [tool.metadata]
 copyright = "AUTO kobo"

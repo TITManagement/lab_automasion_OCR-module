@@ -20,7 +20,17 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 
 ## 概要
 
-このディレクトリは [../PaddleOCR](../PaddleOCR/) 本体を改変せずに利用するための外部ラッパーです。
+この README は、[ocr_wrapper](.) 配下だけを対象にした Python パッケージ保守用の開発者向け説明です。
+
+モジュール全体の初回セットアップ、利用開始、PaddleOCR clone 方針、CI の入口は [../README.md](../README.md) を正本とします。この README では、[ocr_wrapper](.) 配下の責務分割、直接実行、回帰テストだけを扱います。
+
+## README の責務境界
+
+| README | 扱う内容 | 扱わない内容 |
+| --- | --- | --- |
+| [../README.md](../README.md) | [../PaddleOCR](../PaddleOCR/) を含めたモジュール全体の概要、セットアップ、利用開始、PaddleOCR の配置と扱い、CI と運用方針 | wrapper 内部関数の詳細、補正アルゴリズムの詳細 |
+| [README.md](README.md) | [ocr_wrapper](.) 配下に閉じた Python パッケージ構成、各 Python モジュールの責務、開発者向け直接実行、回帰テスト | モジュール全体の導入方針、PaddleOCR clone 方針、文書全体の索引 |
+| [../docs/ocr_support_algorithm_design.md](../docs/ocr_support_algorithm_design.md) | OCR 補助アルゴリズムの設計 | Python パッケージ構成や実行コマンド一覧 |
 
 ## 対象者
 
@@ -33,15 +43,18 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 - [../PaddleOCR](../PaddleOCR/) は編集しない
 - このラッパーから `paddleocr` CLI を呼び出す
 - 回帰テストは golden JSON 比較で行う
+- GUI、画像処理、OCR 実行、テキスト補正の責務を分ける
 
-## 構成
+## Python モジュール構成
 
-- [src/ocr_wrapper/camera_ocr_gui.py](src/ocr_wrapper/camera_ocr_gui.py): Camera OCR GUI
-- [src/ocr_wrapper/camera_ocr.py](src/ocr_wrapper/camera_ocr.py): OpenCVベースの簡易カメラOCR
-- [src/ocr_wrapper/run_ocr.py](src/ocr_wrapper/run_ocr.py): 単発OCR実行とセキュリティゲート
-- [src/ocr_wrapper/text_processing.py](src/ocr_wrapper/text_processing.py): OCR出力解析と補正
-- [src/ocr_wrapper/image_processing.py](src/ocr_wrapper/image_processing.py): ROI切り出しと画像強調
-- [src/ocr_wrapper/ocr_runtime.py](src/ocr_wrapper/ocr_runtime.py): PaddleOCR CLI実行補助とログ整形
+| ファイル | 責務 | 主な利用元 |
+| --- | --- | --- |
+| [src/ocr_wrapper/camera_ocr_gui.py](src/ocr_wrapper/camera_ocr_gui.py) | GUI、カメラ制御、ROI 操作、非同期 OCR 実行 | [../main.py](../main.py) の `camera-ocr-gui` |
+| [src/ocr_wrapper/camera_ocr.py](src/ocr_wrapper/camera_ocr.py) | OpenCV ベースの簡易カメラ OCR | [../main.py](../main.py) の `camera-ocr` |
+| [src/ocr_wrapper/run_ocr.py](src/ocr_wrapper/run_ocr.py) | 単発 OCR 実行とセキュリティゲート | `lab-ocr` console script |
+| [src/ocr_wrapper/ocr_runtime.py](src/ocr_wrapper/ocr_runtime.py) | PaddleOCR CLI 実行補助とログ整形 | GUI / runner |
+| [src/ocr_wrapper/image_processing.py](src/ocr_wrapper/image_processing.py) | ROI 切り出しと画像強調 | GUI / OCR 前処理 |
+| [src/ocr_wrapper/text_processing.py](src/ocr_wrapper/text_processing.py) | OCR 出力解析、Raw / Corrected 生成、補正ルール | GUI / camera OCR |
 
 ## 依存関係
 
@@ -56,20 +69,20 @@ PaddleOCR 本体を改変せず、CLI 実行・セキュリティゲート・回
 
 ## 最短セットアップ
 
-`AILAB_ROOT` は AiLab ルートを指す環境変数です。以下は AiLab ルートで実行する例です。社内 pip 設定を使う環境では `PIP_CONFIG_FILE` を指定してください。不要な環境では未指定で構いません。
+通常の初回セットアップは [../README.md](../README.md) を参照してください。
+
+wrapper を直接確認する場合は、モジュールルートで作成済みの PaddleOCR 実行用仮想環境を有効化します。以下はモジュールルートから実行する例です。PaddleOCR の配置や仮想環境作成は [../README.md](../README.md) の責務です。
 
 ```bash
-export AILAB_ROOT="$(pwd)"
 # 必要な環境のみ:
-# export PIP_CONFIG_FILE="$AILAB_ROOT/pip.conf.local"
-cd "$AILAB_ROOT/lab_automation_module/lab_automasion_OCR-module/PaddleOCR"
+# export PIP_CONFIG_FILE="./pip.conf"
+cd PaddleOCR
 source .venv_paddleocr311/bin/activate
 ```
 
 ## 単発OCR実行
 
 ```bash
-cd "$AILAB_ROOT/lab_automation_module/lab_automasion_OCR-module"
 python ocr_wrapper/src/ocr_wrapper/run_ocr.py \
   --image ocr_wrapper/tests/golden/sample.png \
   --out ocr_wrapper/tests/output/sample_result.json \
@@ -93,3 +106,9 @@ python ocr_wrapper/tests/test_regression.py \
   --work ocr_wrapper/tests/output/sample_result.current.json \
   --lang japan
 ```
+
+## 開発者向け情報
+
+docstring / comment の記載規約は [../docs/dev/notes/DEVELOPER_GUIDE.md](../docs/dev/notes/DEVELOPER_GUIDE.md) を正本とします。
+
+README の記載形式は [../../../README_STANDARD.md](../../../README_STANDARD.md) に従います。

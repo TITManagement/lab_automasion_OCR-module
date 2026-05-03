@@ -20,9 +20,20 @@
 
 ## 概要
 
-PaddleOCR を upstream/vendor として外側から利用する Camera OCR モジュールです。
+PaddleOCR を upstream/vendor として同一ディレクトリ配下に配置し、外側の wrapper から利用する Camera OCR モジュールです。
 
-このリポジトリは、[PaddleOCR](PaddleOCR/) 本体を直接コミットしません。PaddleOCR は clone 後に取得し、OCR の起動、GUI、ROI、ログ整形、後処理、オフライン運用はこのリポジトリ側の wrapper で管理します。
+この README は、clone 後に配置する [PaddleOCR](PaddleOCR/) を含めた [lab_automasion_OCR-module](.) 全体を対象にします。ただし、[PaddleOCR](PaddleOCR/) 本体はこのリポジトリには直接コミットしません。OCR の起動、GUI、ROI、ログ整形、後処理、オフライン運用はこのリポジトリ側の wrapper で管理します。
+
+この README は、[PaddleOCR](PaddleOCR/) を含むモジュール全体の入口です。初回セットアップ、利用開始、PaddleOCR の配置、運用方針、関連ドキュメントへの導線を扱います。wrapper 実装の詳細な責務分割は [ocr_wrapper/README.md](ocr_wrapper/README.md) を参照してください。
+
+## README の責務境界
+
+| README | 扱う内容 | 扱わない内容 |
+| --- | --- | --- |
+| [README.md](README.md) | [PaddleOCR](PaddleOCR/) を含めたモジュール全体の概要、セットアップ、利用開始、PaddleOCR の配置と扱い、CI と運用方針 | wrapper 内部関数の詳細、補正アルゴリズムの詳細、テストデータ別の結果 |
+| [ocr_wrapper/README.md](ocr_wrapper/README.md) | [ocr_wrapper](ocr_wrapper/) 配下に閉じた Python パッケージ構成、各 Python モジュールの責務、開発者向け直接実行、回帰テスト | モジュール全体の導入方針、PaddleOCR clone 方針、文書全体の索引 |
+| [ocr_synthetic_data/README.md](ocr_synthetic_data/README.md) | [ocr_synthetic_data](ocr_synthetic_data/) 配下に閉じた synthetic data 生成、教師データ拡張、PaddleOCR 学習形式 export | OCR 実行 GUI、PaddleOCR 本体の学習実行 |
+| [docs/ocr_support_algorithm_design.md](docs/ocr_support_algorithm_design.md) | PaddleOCR を補助する後処理・ROI・mojibake 補正の設計 | 日常操作手順、パッケージ構成一覧 |
 
 ## 対象者
 
@@ -62,10 +73,13 @@ git clone https://github.com/PaddlePaddle/PaddleOCR.git PaddleOCR
 ## 主な機能
 
 - Camera OCR GUI
-- ROI ドラッグ指定と ROI プレビュー
+- アスペクト比を維持した Camera / ROI 左右プレビュー
+- マウスドラッグによる ROI 指定と ROI プレビュー
 - PaddleOCR CLI の offline-first 実行
-- OCR結果の Raw / Corrected 並列表示
+- OCR結果の Corrected / Raw 並列表示
+- Auto / Off / Basic / Context の OCR 後処理モード
 - 郵便番号、TEL/FAX、URL、英数字記号、mojibake の安全寄り後処理
+- OCR 評価・学習向け synthetic data 生成
 - セキュリティ監査・オフライン運用補助
 
 ## 使い方
@@ -75,6 +89,15 @@ Camera OCR GUI:
 ```bash
 python main.py camera-ocr-gui
 ```
+
+主な操作:
+
+- `Start`: カメラプレビュー開始
+- `Stop`: カメラプレビュー停止
+- `Run OCR`: 現在フレームまたは ROI に対して OCR 実行
+- `ROI`: ROI 利用の有効化
+- Camera プレビュー上のドラッグ操作: OCR 対象 ROI を指定
+- `Auto` / `Off` / `Basic` / `Context`: Corrected OCR に適用する後処理モード
 
 OpenCV ベースの簡易 Camera OCR:
 
@@ -88,6 +111,15 @@ python main.py camera-ocr
 python main.py ocr -i ./sample.png --lang japan
 ```
 
+パッケージを editable install した環境では、console script からも起動できます。
+
+```bash
+lab-camera-ocr-gui
+lab-camera-ocr
+lab-ocr --image ./sample.png --out ./sample_result.json --lang japan
+lab-ocr-generate-variants ocr_wrapper/tests/evaluation/cases/img_0678
+```
+
 ## 構成
 
 ```text
@@ -96,19 +128,53 @@ lab_automasion_OCR-module/
 ├── docs/
 ├── main.py
 ├── ocr_wrapper/
+├── ocr_synthetic_data/
+├── PaddleOCR/        # clone 後に配置。git 管理対象外
 └── pyproject.toml
 ```
 
 詳細:
 
 - [ocr_wrapper/README.md](ocr_wrapper/README.md)
+- [ocr_synthetic_data/README.md](ocr_synthetic_data/README.md)
 - [docs/ocr_support_algorithm_design.md](docs/ocr_support_algorithm_design.md)
+- [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md)
 - [_post_clone_assets/README_POST_CLONE_ASSETS.md](_post_clone_assets/README_POST_CLONE_ASSETS.md)
 - [_post_clone_assets/security_ops/README_SECURITY_OFFLINE.md](_post_clone_assets/security_ops/README_SECURITY_OFFLINE.md)
 
 ## 開発者向け情報
 
 `PaddleOCR/` は `.gitignore` で除外します。PaddleOCR 本体の修正が必要な場合は、まず upstream 側の変更として扱い、このリポジトリ側では wrapper、入力前処理、後処理、モデル選択、運用スクリプトで対応します。
+
+wrapper 側の主な責務分割:
+
+- [camera_ocr_gui.py](ocr_wrapper/src/ocr_wrapper/camera_ocr_gui.py): GUI、カメラ制御、ROI 操作、非同期 OCR 実行
+- [camera_ocr.py](ocr_wrapper/src/ocr_wrapper/camera_ocr.py): OpenCV ベースの簡易カメラ OCR
+- [run_ocr.py](ocr_wrapper/src/ocr_wrapper/run_ocr.py): 単発 OCR 実行とセキュリティゲート
+- [ocr_runtime.py](ocr_wrapper/src/ocr_wrapper/ocr_runtime.py): PaddleOCR CLI 実行補助とログ整形
+- [image_processing.py](ocr_wrapper/src/ocr_wrapper/image_processing.py): ROI 切り出しと画像強調
+- [text_processing.py](ocr_wrapper/src/ocr_wrapper/text_processing.py): OCR 出力解析、Raw / Corrected 生成、補正ルール
+
+synthetic data 側の主な責務分割:
+
+- [augment.py](ocr_synthetic_data/src/ocr_synthetic_data/augment.py): 明るさ、ぼけ、傾きなどの画像変換
+- [case_schema.py](ocr_synthetic_data/src/ocr_synthetic_data/case_schema.py): evaluation case の標準ファイル配置
+- [generate_variants.py](ocr_synthetic_data/src/ocr_synthetic_data/generate_variants.py): source image から synthetic variants を生成
+- [export_paddleocr_dataset.py](ocr_synthetic_data/src/ocr_synthetic_data/export_paddleocr_dataset.py): PaddleOCR 学習形式 export の境界
+
+docstring / comment の記載規約は [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md) を正本とします。
+
+README の記載形式は [../../README_STANDARD.md](../../README_STANDARD.md) に従います。
+
+## CI
+
+GitHub Actions では、PR に対して editable install と Python compile check を実行します。
+
+- [qa_gate.yml](.github/workflows/qa_gate.yml): `python -m pip install -e .` と `python -m compileall -q .`
+- [agents-governance.yml](.github/workflows/agents-governance.yml): [AGENTS.md](AGENTS.md) のガバナンス記載確認
+- [docs_automation.yml](.github/workflows/docs_automation.yml): README 正規化チェック
+
+module docstring の存在検証は、現時点では CI の強制対象ではありません。運用規約は [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md) に定義しています。
 
 ## ライセンス
 

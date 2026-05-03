@@ -14,6 +14,7 @@ env/
 *.temp
 *.log
 ocr_wrapper/tests/output/
+ocr_wrapper/tests/evaluation/cases/*/variants/
 
 # Security/offline generated heavy artifacts
 _post_clone_assets/security_ops/reports/wheelhouse/
