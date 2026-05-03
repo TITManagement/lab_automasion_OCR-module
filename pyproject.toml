@@ -35,10 +35,13 @@ lab-ocr = "ocr_wrapper.run_ocr:main"
 lab-camera-ocr = "ocr_wrapper.camera_ocr:main"
 lab-camera-ocr-gui = "ocr_wrapper.camera_ocr_gui:main"
 lab-ocr-generate-variants = "ocr_synthetic_data.generate_variants:main"
+lab-ocr-generate-roi-strips = "ocr_dataset.source_cases.generate_roi_strips:main"
+lab-ocr-prepare-source-case = "ocr_dataset.source_cases.prepare_source_case:main"
+lab-ocr-source-case-gui = "ocr_dataset.source_cases.source_case_gui:main"
 
 [tool.setuptools.packages.find]
-where = ["ocr_wrapper/src", "ocr_synthetic_data/src"]
-include = ["ocr_wrapper*", "ocr_synthetic_data*"]
+where = ["ocr_wrapper/src", "ocr_synthetic_data/src", "ocr_dataset/src"]
+include = ["ocr_wrapper*", "ocr_synthetic_data*", "ocr_dataset*"]
 
 [tool.metadata]
 copyright = "AUTO kobo"

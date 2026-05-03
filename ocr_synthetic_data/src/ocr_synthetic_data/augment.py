@@ -33,3 +33,4 @@ def apply_blur(image: Image.Image, radius: float) -> Image.Image:
 def rotate_keep_canvas(image: Image.Image, degrees: float) -> Image.Image:
     """キャンバスを広げず、背景を白で埋めながら小角度回転する。"""
     return image.rotate(degrees, resample=Image.Resampling.BICUBIC, expand=False, fillcolor=(255, 255, 255))
+

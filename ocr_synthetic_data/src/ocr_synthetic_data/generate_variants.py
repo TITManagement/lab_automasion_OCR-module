@@ -13,13 +13,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .augment import adjust_brightness, apply_blur, load_image, rotate_keep_canvas
-from .case_schema import EvaluationCase
+from ocr_dataset.paths import resolve_dataset_path
+from ocr_dataset.source_cases.schema import EvaluationCase
+from ocr_synthetic_data.augment import adjust_brightness, apply_blur, load_image, rotate_keep_canvas
 
 
 def generate_variants(case_dir: Path) -> list[Path]:
     """指定 case の source image から最小セットの synthetic variants を生成する。"""
-    case = EvaluationCase(case_dir=case_dir)
+    case = EvaluationCase(case_dir=resolve_dataset_path(case_dir))
     case.require_source_assets()
     case.variants_dir.mkdir(parents=True, exist_ok=True)
 

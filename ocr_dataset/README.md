@@ -1,0 +1,197 @@
+# OCR Dataset
+
+<!-- README_LEVEL: L2 -->
+
+| 項目 | 内容 |
+| --- | --- |
+| 文書ID | `LABOCR-DATASET-README` |
+| 作成日 | `2026-05-03` |
+| 作成者 | `Tinoue` |
+| 最終更新日 | `2026-05-03` |
+| 最終更新者 | `Codex` |
+| 版数 | `v1.0` |
+| 状態 | `運用中` |
+
+<div align="center">
+
+OCR 評価・学習に再利用する source case 資産と dataset 整備ツールを扱います。
+
+</div>
+
+## 概要
+
+この README は、[ocr_dataset](.) 配下だけを対象にした開発者向け説明です。
+
+[ocr_dataset](.) は、人が確認した元画像、正解テキスト、ROI 定義、PaddleOCR 学習形式への export 境界を扱います。画像の水増し生成ロジックは [../ocr_synthetic_data/README.md](../ocr_synthetic_data/README.md) を参照してください。
+
+## README の責務境界
+
+| README | 扱う内容 | 扱わない内容 |
+| --- | --- | --- |
+| [../README.md](../README.md) | [../vendor/PaddleOCR](../vendor/PaddleOCR/) を含めたモジュール全体の概要、セットアップ、利用開始、CI と運用方針 | dataset 個別仕様 |
+| [README.md](README.md) | source case 資産、ROI 定義、PaddleOCR 学習形式 export 境界 | OCR 実行 GUI、synthetic variants 生成ロジック |
+| [../ocr_synthetic_data/README.md](../ocr_synthetic_data/README.md) | source case から synthetic variants を生成する処理 | source case 資産の保管、PaddleOCR 学習形式 export |
+
+## 対象者
+
+- OCR 評価・学習用の source case を整備する開発者
+- ROI 定義や正解データを保守する検証担当者
+- PaddleOCR fine-tuning 用 dataset export を準備する担当者
+
+## 依存関係
+
+- Python 3.11 系
+- [../pyproject.toml](../pyproject.toml) に定義された画像処理ライブラリ
+- 元画像、正解テキスト、ROI 定義を含む source case
+
+## 最短セットアップ
+
+通常の初回セットアップは [../README.md](../README.md) を参照してください。
+
+editable install 後、Python から package import を確認します。
+
+```bash
+python -c "import ocr_dataset; print(ocr_dataset.__version__)"
+```
+
+## Python モジュール構成
+
+| ディレクトリ | 責務 |
+| --- | --- |
+| [src/ocr_dataset/source_cases](src/ocr_dataset/source_cases/) | source case の schema と ROI 整備 |
+| [src/ocr_dataset/exporters](src/ocr_dataset/exporters/) | PaddleOCR など外部学習形式への export |
+
+## Source Case
+
+元画像、正解テキスト、ROI 定義は [source_cases](source_cases/) に保存します。
+
+[source_cases](source_cases/) は、別母艦でも再利用する OCR データセット資産です。人が確認した正解データを保持し、synthetic variants や PaddleOCR 学習形式 export の入力にします。
+
+dataset 系 CLI / GUI のファイル入出力は、この [ocr_dataset](.) を起点にします。相対パスは `source_cases/img_0678` のように指定します。過去のコマンド例との互換のため `ocr_dataset/source_cases/img_0678` も受け付けますが、標準表記は `source_cases/img_0678` です。
+
+例:
+
+```text
+source_cases/img_0678/
+├── IMG_0678.jpg
+├── expected.txt
+├── expected_fields.json
+├── roi_labels.json
+└── rois.json
+```
+
+`variants/` は生成物のため git 管理対象外です。
+
+短冊状 ROI を自動生成する例:
+
+```bash
+lab-ocr-generate-roi-strips source_cases/img_0678
+```
+
+`--image-name` を指定すると、同じ source case 配下の任意の画像ファイルから ROI を生成できます。データセットとして再利用する場合は、原本ファイル名を維持した画像を正本にします。
+
+画像追加・更新後に標準ファイルをまとめて整える例:
+
+```bash
+lab-ocr-prepare-source-case source_cases/img_0678
+```
+
+このコマンドは、`expected.txt` がなければ空ファイルを作成し、`rois.json` を再生成し、`roi_labels.json` を ROI ID に合わせて同期します。既存の `expected.txt` は `--overwrite-expected` を指定しない限り上書きしません。既存の ROI ラベルは可能な範囲で保持し、ROI 座標が変わったラベルは `needs_review` に戻します。
+
+GUI で source case を作成する例:
+
+```bash
+lab-ocr-source-case-gui
+```
+
+GUI では、元画像、case ID、画像全体の正解文字列を入力します。実行すると、元画像のコピー、`expected.txt` 保存、`rois.json` 生成、`roi_labels.json` 初期生成、`variants/` 生成をまとめて行います。
+
+## 学習準備プロセス
+
+[source_cases/img_0678/IMG_0678.jpg](source_cases/img_0678/IMG_0678.jpg) と [source_cases/img_0678/expected.txt](source_cases/img_0678/expected.txt) は、PaddleOCR の fine-tuning に向けた source case です。
+
+現時点でこのリポジトリに実装済みの範囲は、学習そのものではなく、学習に使う source case の整備と synthetic variants 生成までです。PaddleOCR 学習形式への export 境界は [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) にありますが、実処理は未実装です。
+
+処理の流れ:
+
+```text
+IMG_0678.jpg
+  -> expected.txt を人が確認して整備
+  -> rois.json を生成または調整
+  -> roi_labels.json に ROI ごとの正解文字列を入力
+  -> variants/ を生成
+  -> PaddleOCR 学習形式へ export
+  -> vendor/PaddleOCR 側で fine-tuning
+```
+
+### 1. 正解テキストを整備する
+
+[source_cases/img_0678/expected.txt](source_cases/img_0678/expected.txt) は、[source_cases/img_0678/IMG_0678.jpg](source_cases/img_0678/IMG_0678.jpg) に写っている文字の正解データです。
+
+このファイルは OCR 出力ではなく、人が確認した教師データとして扱います。OCR の誤認識をそのまま貼らず、画像と照合して正しい文字列に直します。
+
+新規 source case は GUI から作成できます。
+
+```bash
+lab-ocr-source-case-gui
+```
+
+### 2. ROI 短冊を生成する
+
+ROI 定義は [source_cases/img_0678/rois.json](source_cases/img_0678/rois.json) に保存します。
+
+```bash
+lab-ocr-generate-roi-strips source_cases/img_0678
+```
+
+`rois.json` には `source_image`、画像サイズ、短冊ごとの座標を保存します。`IMG_0678.jpg` から生成した場合、`source_image` は `IMG_0678.jpg` になります。
+
+### 3. ROI ごとの正解ラベルを整備する
+
+ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_cases/img_0678/roi_labels.json) に保存します。
+
+`expected.txt` は画像全体の全文正解です。PaddleOCR の学習では、切り出した ROI 画像ごとに、その ROI に写っている文字列だけを教師ラベルにします。
+
+例:
+
+```json
+{
+  "roi_id": "strip_0001",
+  "text": "ギャラリー",
+  "status": "verified"
+}
+```
+
+自動生成直後の `roi_labels.json` は `status: needs_labeling` とし、`text` は空にします。画像と ROI を人が確認してから `text` を入力し、確認済みのものは `status: verified` に変更します。未確認のラベルを学習に使ってはいけません。
+
+画像を差し替えた場合は、次のコマンドで `rois.json` と `roi_labels.json` を同期します。
+
+```bash
+lab-ocr-prepare-source-case source_cases/img_0678
+```
+
+### 4. Synthetic variants を生成する
+
+明るさ、ぼけ、回転などの揺らぎ画像は [../ocr_synthetic_data](../ocr_synthetic_data/) 側で生成します。
+
+```bash
+lab-ocr-generate-variants source_cases/img_0678
+```
+
+生成物は `source_cases/img_0678/variants/` に保存されます。`variants/` は再生成可能な派生データなので git 管理対象外です。
+
+### 5. PaddleOCR 学習形式へ export する
+
+PaddleOCR の認識モデルを学習するには、最終的に PaddleOCR が要求する label file と画像ディレクトリへ変換する必要があります。
+
+この export は今後 [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) に実装します。現時点では境界だけを固定し、誤って未完成の export を学習に使わないよう `NotImplementedError` にしています。
+
+### 6. PaddleOCR 側で fine-tuning する
+
+学習実行は [../vendor/PaddleOCR](../vendor/PaddleOCR/) 側の責務です。このリポジトリでは PaddleOCR 本体を直接改変せず、source case、ROI、variants、export までを管理します。
+
+## 開発者向け情報
+
+docstring / comment の記載規約は [../docs/dev/notes/DEVELOPER_GUIDE.md](../docs/dev/notes/DEVELOPER_GUIDE.md) を正本とします。
+
+README の記載形式は [../../../README_STANDARD.md](../../../README_STANDARD.md) に従います。

@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "source_image": "IMG_0678.jpg",
+  "source_rois": "rois.json",
+  "label_status": "needs_human_labeling",
+  "labels": [
+    {
+      "roi_id": "strip_0001",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0002",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0003",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0004",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0005",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0006",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0007",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0008",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0009",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0010",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0011",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0012",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0013",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0014",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0015",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0016",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0017",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0018",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0019",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0020",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0021",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0022",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    },
+    {
+      "roi_id": "strip_0023",
+      "text": "",
+      "status": "needs_labeling",
+      "note": "Fill with the exact text visible in this ROI."
+    }
+  ]
+}

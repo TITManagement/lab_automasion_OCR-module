@@ -13,6 +13,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
+
 
 @dataclass(frozen=True)
 class EvaluationCase:
@@ -22,7 +24,18 @@ class EvaluationCase:
 
     @property
     def source_image(self) -> Path:
-        """元画像ファイルの標準パスを返す。"""
+        """元画像ファイルの標準パスを返す。
+
+        原本ファイル名を source case の識別情報として残すため、`source.jpg`
+        以外の画像が存在する場合はそちらを優先する。
+        """
+        images = sorted(
+            path
+            for path in self.case_dir.iterdir()
+            if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES and path.name != "source.jpg"
+        )
+        if images:
+            return images[0]
         return self.case_dir / "source.jpg"
 
     @property
@@ -39,6 +52,11 @@ class EvaluationCase:
     def rois(self) -> Path:
         """ROI 定義 JSON の標準パスを返す。"""
         return self.case_dir / "rois.json"
+
+    @property
+    def roi_labels(self) -> Path:
+        """ROI ごとの正解ラベル JSON の標準パスを返す。"""
+        return self.case_dir / "roi_labels.json"
 
     @property
     def variants_dir(self) -> Path:

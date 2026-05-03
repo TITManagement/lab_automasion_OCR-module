@@ -17,3 +17,4 @@ def export_paddleocr_dataset(case_dir: Path, output_dir: Path) -> Path:
     """PaddleOCR dataset export の出力先を作成し、将来実装の境界を固定する。"""
     output_dir.mkdir(parents=True, exist_ok=True)
     raise NotImplementedError("PaddleOCR dataset export is not implemented yet.")
+
