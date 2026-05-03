@@ -117,7 +117,7 @@ python main.py ocr -i ./sample.png --lang japan
 lab-camera-ocr-gui
 lab-camera-ocr
 lab-ocr --image ./sample.png --out ./sample_result.json --lang japan
-lab-ocr-generate-variants ocr_synthetic_data/tests/evaluation/cases/img_0678
+lab-ocr-generate-variants ocr_synthetic_data/datasets/source_cases/img_0678
 ```
 
 ## 構成
