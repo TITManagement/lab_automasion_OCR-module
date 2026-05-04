@@ -1,16 +1,18 @@
 """source case 作成用の CustomTkinter GUI。
 
 責務:
-    - 仕様者が選択した元画像と全文正解テキストから source case を作成する。
+    - 使用者が選択した元画像と全文正解テキストから source case を作成する。
     - ROI / ROI label / synthetic variants / ROI OCR 候補生成を GUI 操作で実行する。
+    - ROI 短冊画像と候補テキストを確認し、ROI ごとの正解ラベルを保存する。
 
 責務外:
-    - ROI ごとのラベル確認、PaddleOCR 学習形式 export、学習実行。
+    - PaddleOCR 学習形式 export、学習実行。
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import queue
 import subprocess
@@ -20,11 +22,20 @@ from pathlib import Path
 from tkinter import filedialog, messagebox, simpledialog
 
 import customtkinter as ctk
+from PIL import Image
 
 from aist_guiparts import BaseApp
 from ocr_dataset.paths import dataset_root
 from ocr_dataset.source_cases.source_case_creator import create_source_case
-from ocr_dataset.source_cases.vision_batch_ocr import DEFAULT_MODEL, process_roi_strips
+from ocr_dataset.source_cases.sync_roi_candidates import sync_roi_ocr_candidates
+from ocr_dataset.source_cases.vision_batch_ocr import (
+    ANTHROPIC_MODELS,
+    DEFAULT_MODEL,
+    DEFAULT_PROVIDER,
+    OPENAI_MODELS,
+    PROVIDER_OPENAI,
+    process_roi_strips,
+)
 
 
 def _friendly_prepare_error(message: str) -> str:
@@ -46,6 +57,8 @@ def _friendly_prepare_error(message: str) -> str:
         )
     if "ANTHROPIC_API_KEY" in message:
         return "ROI 短冊から OCR 候補テキストを生成するには ANTHROPIC_API_KEY が必要です。"
+    if "OPENAI_API_KEY" in message:
+        return "ROI 短冊から OCR 候補テキストを生成するには OPENAI_API_KEY が必要です。"
     if "was not found" in message and "Anthropic model" in message:
         return (
             "指定した Anthropic model が見つかりませんでした。\n\n"
@@ -61,26 +74,33 @@ class SourceCaseCreatorGui(BaseApp):
     def __init__(self) -> None:
         super().__init__(theme="light")
         self.title("OCR Source Case Builder")
-        self.geometry("1040x820")
-        self.minsize(920, 700)
+        self.geometry("1180x820")
+        self.minsize(1080, 700)
 
         self.image_path = ctk.StringVar()
         self.case_id = ctk.StringVar()
         self.overwrite = ctk.BooleanVar(value=False)
         self.generate_variants = ctk.BooleanVar(value=True)
         self.generate_ocr_candidates = ctk.BooleanVar(value=False)
+        self.vision_provider = ctk.StringVar(value=DEFAULT_PROVIDER)
         self.vision_model = ctk.StringVar(value=DEFAULT_MODEL)
+        self.review_case_dir = ctk.StringVar()
+        self.review_progress = ctk.StringVar(value="未読込")
+        self.review_status = ctk.StringVar(value="needs_labeling")
         self._queue: queue.Queue[tuple[str, object]] = queue.Queue()
         self._worker: threading.Thread | None = None
         self._result_link_paths: dict[str, Path] = {}
+        self._review_doc: dict[str, object] | None = None
+        self._review_labels: list[dict[str, object]] = []
+        self._review_index = 0
+        self._review_image: ctk.CTkImage | None = None
 
         self._build_ui()
         self.after(100, self._poll_queue)
 
     def _build_ui(self) -> None:
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(5, weight=3)
-        self.grid_rowconfigure(9, weight=4)
+        self.grid_rowconfigure(3, weight=1)
 
         header = self.build_default_titlebar(
             title="OCR Source Case Builder",
@@ -103,8 +123,29 @@ class SourceCaseCreatorGui(BaseApp):
         )
         purpose.grid(row=2, column=0, padx=18, pady=(0, 8), sticky="w")
 
-        input_frame = ctk.CTkFrame(self)
-        input_frame.grid(row=3, column=0, padx=18, pady=8, sticky="ew")
+        tabs = ctk.CTkTabview(self)
+        tabs.grid(row=3, column=0, padx=18, pady=(8, 18), sticky="nsew")
+        tabs.add("作成")
+        tabs.add("ROI確認")
+        self.tabs = tabs
+
+        create_tab = tabs.tab("作成")
+        create_tab.grid_columnconfigure(0, weight=3)
+        create_tab.grid_columnconfigure(1, weight=2)
+        create_tab.grid_rowconfigure(0, weight=1)
+
+        left_frame = ctk.CTkFrame(create_tab, fg_color="transparent")
+        left_frame.grid(row=0, column=0, padx=(0, 10), pady=(8, 10), sticky="nsew")
+        left_frame.grid_columnconfigure(0, weight=1)
+        left_frame.grid_rowconfigure(2, weight=1)
+
+        review_frame = ctk.CTkFrame(create_tab)
+        review_frame.grid(row=0, column=1, padx=(10, 0), pady=(8, 10), sticky="nsew")
+        review_frame.grid_columnconfigure(0, weight=1)
+        review_frame.grid_rowconfigure(2, weight=1)
+
+        input_frame = ctk.CTkFrame(left_frame)
+        input_frame.grid(row=0, column=0, pady=(0, 8), sticky="ew")
         input_frame.grid_columnconfigure(1, weight=1)
 
         ctk.CTkLabel(
@@ -120,8 +161,8 @@ class SourceCaseCreatorGui(BaseApp):
             row=1, column=2, padx=12, pady=12
         )
 
-        expected_header = ctk.CTkFrame(self, fg_color="transparent")
-        expected_header.grid(row=4, column=0, padx=18, pady=(12, 4), sticky="ew")
+        expected_header = ctk.CTkFrame(left_frame, fg_color="transparent")
+        expected_header.grid(row=1, column=0, pady=(6, 4), sticky="ew")
         expected_header.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(expected_header, text="元画像に対応する全文正解テキスト").grid(
             row=0, column=0, sticky="w"
@@ -129,57 +170,364 @@ class SourceCaseCreatorGui(BaseApp):
         ctk.CTkButton(expected_header, text="テキスト読込", command=self._load_expected_text, width=130).grid(
             row=0, column=1, sticky="e"
         )
-        self.expected_text = ctk.CTkTextbox(self, wrap="word", height=220)
-        self.expected_text.grid(row=5, column=0, padx=18, pady=4, sticky="nsew")
+        self.expected_text = ctk.CTkTextbox(left_frame, wrap="word", height=180)
+        self.expected_text.grid(row=2, column=0, pady=(0, 8), sticky="nsew")
 
-        output_frame = ctk.CTkFrame(self)
-        output_frame.grid(row=6, column=0, padx=18, pady=8, sticky="ew")
+        output_frame = ctk.CTkFrame(left_frame)
+        output_frame.grid(row=3, column=0, pady=8, sticky="ew")
         output_frame.grid_columnconfigure(0, minsize=120)
+        output_frame.grid_columnconfigure(1, weight=1)
         output_frame.grid_columnconfigure(2, weight=0)
-        output_frame.grid_columnconfigure(3, weight=0)
-        output_frame.grid_columnconfigure(4, weight=1)
 
         ctk.CTkLabel(
             output_frame,
             text="2. 生成内容: source case ファイル、ROI 短冊、OCR 候補テキスト",
             font=ctk.CTkFont(weight="bold"),
         ).grid(
-            row=0, column=0, columnspan=5, padx=12, pady=(12, 4), sticky="w"
+            row=0, column=0, columnspan=3, padx=12, pady=(12, 4), sticky="w"
         )
         ctk.CTkLabel(output_frame, text="Case ID").grid(row=1, column=0, padx=12, pady=(10, 8), sticky="w")
-        ctk.CTkEntry(output_frame, textvariable=self.case_id, placeholder_text="img_0678", width=430).grid(
-            row=1, column=1, padx=8, pady=(10, 8), sticky="w"
+        ctk.CTkEntry(output_frame, textvariable=self.case_id, placeholder_text="img_0678").grid(
+            row=1, column=1, padx=8, pady=(10, 8), sticky="ew"
         )
         ctk.CTkCheckBox(output_frame, text="既存 case を上書き", variable=self.overwrite).grid(
             row=1, column=2, padx=(12, 8), pady=(10, 8), sticky="w"
         )
-        ctk.CTkCheckBox(output_frame, text="合成バリエーション画像を生成", variable=self.generate_variants).grid(
+        ctk.CTkCheckBox(output_frame, text="学習用の水増し画像を生成", variable=self.generate_variants).grid(
             row=2, column=1, padx=8, pady=(0, 8), sticky="w"
         )
         ctk.CTkCheckBox(
             output_frame,
             text="ROI 短冊から OCR 候補 .txt を生成",
             variable=self.generate_ocr_candidates,
-        ).grid(row=2, column=2, columnspan=2, padx=(12, 8), pady=(0, 8), sticky="w")
+        ).grid(row=2, column=2, padx=(12, 8), pady=(0, 8), sticky="w")
 
-        ctk.CTkLabel(output_frame, text="Vision model").grid(row=3, column=0, padx=12, pady=(0, 12), sticky="w")
-        ctk.CTkEntry(output_frame, textvariable=self.vision_model, width=430).grid(
-            row=3, column=1, padx=8, pady=(0, 12), sticky="w"
+        ctk.CTkLabel(output_frame, text="Vision provider").grid(row=3, column=0, padx=12, pady=(0, 8), sticky="w")
+        ctk.CTkOptionMenu(
+            output_frame,
+            variable=self.vision_provider,
+            values=["Anthropic", "OpenAI"],
+            command=self._change_vision_provider,
+        ).grid(row=3, column=1, padx=8, pady=(0, 8), sticky="ew")
+
+        ctk.CTkLabel(output_frame, text="Vision model").grid(row=4, column=0, padx=12, pady=(0, 12), sticky="w")
+        self.vision_model_menu = ctk.CTkOptionMenu(
+            output_frame,
+            variable=self.vision_model,
+            values=ANTHROPIC_MODELS,
+        )
+        self.vision_model_menu.grid(
+            row=4, column=1, padx=8, pady=(0, 12), sticky="ew"
         )
 
-        controls = ctk.CTkFrame(self)
-        controls.grid(row=7, column=0, padx=18, pady=8, sticky="ew")
+        controls = ctk.CTkFrame(left_frame)
+        controls.grid(row=4, column=0, pady=(8, 0), sticky="ew")
         controls.grid_columnconfigure(1, weight=1)
         self.run_button = ctk.CTkButton(controls, text="学習用データを作成", command=self._run_prepare, width=220)
         self.run_button.grid(row=0, column=0, padx=12, pady=12)
         self.status_label = ctk.CTkLabel(controls, text="待機中")
         self.status_label.grid(row=0, column=1, padx=12, pady=12, sticky="w")
 
-        ctk.CTkLabel(self, text="3. 学習前レビュー: 人が確認すべき生成ファイル").grid(
-            row=8, column=0, padx=18, pady=(12, 4), sticky="w"
+        ctk.CTkLabel(
+            review_frame,
+            text="3. 作成結果",
+            font=ctk.CTkFont(weight="bold"),
+        ).grid(row=0, column=0, padx=12, pady=(12, 4), sticky="w")
+        ctk.CTkLabel(
+            review_frame,
+            text=(
+                "作成後は ROI確認 タブで短冊画像と candidate_text を確認し、"
+                "正しい文字列を text に保存します。"
+            ),
+            wraplength=430,
+            justify="left",
+        ).grid(row=1, column=0, padx=12, pady=(0, 8), sticky="ew")
+        self.result_text = ctk.CTkTextbox(review_frame, wrap="word", height=420)
+        self.result_text.grid(row=2, column=0, padx=12, pady=(0, 12), sticky="nsew")
+        self.result_text.insert(
+            "1.0",
+            "作成後、ここに確認対象ファイルへのリンクが表示されます。",
         )
-        self.result_text = ctk.CTkTextbox(self, wrap="word", height=240)
-        self.result_text.grid(row=9, column=0, padx=18, pady=(4, 18), sticky="nsew")
+        self._build_review_tab(tabs.tab("ROI確認"))
+
+    def _build_review_tab(self, tab: ctk.CTkFrame) -> None:
+        tab.grid_columnconfigure(0, weight=3)
+        tab.grid_columnconfigure(1, weight=2)
+        tab.grid_rowconfigure(1, weight=1)
+
+        loader = ctk.CTkFrame(tab)
+        loader.grid(row=0, column=0, columnspan=2, padx=8, pady=(8, 10), sticky="ew")
+        loader.grid_columnconfigure(1, weight=1)
+        ctk.CTkLabel(loader, text="確認するcaseフォルダ").grid(row=0, column=0, padx=12, pady=(12, 4), sticky="w")
+        ctk.CTkEntry(loader, textvariable=self.review_case_dir).grid(row=0, column=1, padx=8, pady=12, sticky="ew")
+        ctk.CTkButton(loader, text="caseフォルダ選択", command=self._select_review_case, width=130).grid(
+            row=0, column=2, padx=(8, 4), pady=12
+        )
+        ctk.CTkButton(loader, text="読込", command=self._load_review_case, width=90).grid(
+            row=0, column=3, padx=(4, 12), pady=12
+        )
+        ctk.CTkLabel(
+            loader,
+            text="例: ocr_dataset/source_cases/img_0678。roi_labels.json と roi_strips を含むフォルダを選びます。",
+            text_color="#555555",
+            wraplength=820,
+            justify="left",
+        ).grid(row=1, column=1, columnspan=3, padx=8, pady=(0, 10), sticky="w")
+
+        guide = ctk.CTkFrame(tab)
+        guide.grid(row=1, column=0, columnspan=2, padx=8, pady=(0, 10), sticky="ew")
+        guide.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(
+            guide,
+            text="ラベル入力の考え方",
+            font=ctk.CTkFont(weight="bold"),
+        ).grid(row=0, column=0, padx=12, pady=(10, 2), sticky="w")
+        ctk.CTkLabel(
+            guide,
+            text=(
+                "text には、この短冊画像をOCRしたときに返ってほしい正解文字列を入れます。"
+                "元ページの見た目レイアウトを無理に再現せず、画像内で読める順序を保ちます。"
+                "自然な行区切りの改行は残し、位置合わせ用の空白や余分な空行は入れすぎないでください。"
+                "2段組みなら左段を上から下、次に右段を上から下の順に書きます。"
+                "text が空の場合は candidate_text を仮入力しますが、verified にする前に必ず画像と照合してください。"
+                "段組みや別文脈が混ざる場合は、文字列を工夫するよりROI分割を見直す方が有効です。"
+            ),
+            wraplength=1040,
+            justify="left",
+        ).grid(row=1, column=0, padx=12, pady=(0, 10), sticky="ew")
+
+        image_panel = ctk.CTkFrame(tab)
+        image_panel.grid(row=2, column=0, padx=(8, 6), pady=(0, 8), sticky="nsew")
+        image_panel.grid_columnconfigure(0, weight=1)
+        image_panel.grid_rowconfigure(1, weight=1)
+        ctk.CTkLabel(
+            image_panel,
+            text="ROI 短冊画像",
+            font=ctk.CTkFont(weight="bold"),
+        ).grid(row=0, column=0, padx=12, pady=(12, 6), sticky="w")
+        self.roi_image_label = ctk.CTkLabel(image_panel, text="case を読み込んでください")
+        self.roi_image_label.grid(row=1, column=0, padx=12, pady=(0, 12), sticky="nsew")
+
+        edit_panel = ctk.CTkFrame(tab)
+        edit_panel.grid(row=2, column=1, padx=(6, 8), pady=(0, 8), sticky="nsew")
+        edit_panel.grid_columnconfigure(0, weight=1)
+        edit_panel.grid_rowconfigure(3, weight=1)
+        edit_panel.grid_rowconfigure(6, weight=2)
+
+        top_line = ctk.CTkFrame(edit_panel, fg_color="transparent")
+        top_line.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="ew")
+        top_line.grid_columnconfigure(0, weight=1)
+        self.roi_id_label = ctk.CTkLabel(top_line, text="ROI未選択", font=ctk.CTkFont(weight="bold"))
+        self.roi_id_label.grid(row=0, column=0, sticky="w")
+        ctk.CTkLabel(top_line, textvariable=self.review_progress).grid(row=0, column=1, sticky="e")
+
+        nav = ctk.CTkFrame(edit_panel, fg_color="transparent")
+        nav.grid(row=1, column=0, padx=12, pady=(0, 8), sticky="ew")
+        nav.grid_columnconfigure(1, weight=1)
+        ctk.CTkButton(nav, text="前へ", command=self._previous_review_label, width=90).grid(row=0, column=0, sticky="w")
+        ctk.CTkButton(nav, text="次へ", command=self._next_review_label, width=90).grid(row=0, column=2, sticky="e")
+
+        ctk.CTkLabel(edit_panel, text="candidate_text").grid(row=2, column=0, padx=12, pady=(0, 4), sticky="w")
+        self.candidate_text = ctk.CTkTextbox(edit_panel, wrap="word", height=140)
+        self.candidate_text.grid(row=3, column=0, padx=12, pady=(0, 8), sticky="nsew")
+        self.candidate_text.configure(state="disabled")
+
+        ctk.CTkButton(
+            edit_panel,
+            text="candidate_text を text にコピー",
+            command=self._copy_candidate_to_text,
+        ).grid(row=4, column=0, padx=12, pady=(0, 8), sticky="ew")
+
+        ctk.CTkLabel(edit_panel, text="text（学習に使う確定文字列）").grid(
+            row=5, column=0, padx=12, pady=(0, 4), sticky="w"
+        )
+        self.label_text = ctk.CTkTextbox(edit_panel, wrap="word", height=180)
+        self.label_text.grid(row=6, column=0, padx=12, pady=(0, 8), sticky="nsew")
+
+        status_row = ctk.CTkFrame(edit_panel, fg_color="transparent")
+        status_row.grid(row=7, column=0, padx=12, pady=(0, 8), sticky="ew")
+        status_row.grid_columnconfigure(1, weight=1)
+        ctk.CTkLabel(status_row, text="status").grid(row=0, column=0, sticky="w")
+        ctk.CTkOptionMenu(
+            status_row,
+            variable=self.review_status,
+            values=["needs_labeling", "needs_review", "verified", "skipped"],
+        ).grid(row=0, column=1, padx=(8, 0), sticky="ew")
+        ctk.CTkLabel(
+            edit_panel,
+            text=(
+                "status: needs_labeling=未確認、needs_review=判断保留、"
+                "verified=画像と照合済みで学習対象、skipped=学習に使わない"
+            ),
+            text_color="#555555",
+            wraplength=430,
+            justify="left",
+        ).grid(row=8, column=0, padx=12, pady=(0, 8), sticky="ew")
+
+        actions = ctk.CTkFrame(edit_panel, fg_color="transparent")
+        actions.grid(row=9, column=0, padx=12, pady=(0, 12), sticky="ew")
+        actions.grid_columnconfigure(0, weight=1)
+        actions.grid_columnconfigure(1, weight=1)
+        ctk.CTkButton(actions, text="保存", command=self._save_current_review_label).grid(
+            row=0, column=0, padx=(0, 4), sticky="ew"
+        )
+        ctk.CTkButton(actions, text="保存して次へ", command=self._save_and_next_review_label).grid(
+            row=0, column=1, padx=(4, 0), sticky="ew"
+        )
+
+    def _change_vision_provider(self, provider: str) -> None:
+        values = OPENAI_MODELS if provider == PROVIDER_OPENAI else ANTHROPIC_MODELS
+        self.vision_model_menu.configure(values=values)
+        self.vision_model.set(values[0])
+
+    def _select_review_case(self) -> None:
+        path = filedialog.askdirectory(
+            title="source case フォルダを選択",
+            initialdir=str(dataset_root() / "source_cases"),
+        )
+        if path:
+            self.review_case_dir.set(path)
+
+    def _load_review_case(self) -> None:
+        case_dir_text = self.review_case_dir.get().strip()
+        if not case_dir_text:
+            messagebox.showerror("読込失敗", "source case フォルダを指定してください。")
+            return
+        case_dir = Path(case_dir_text).expanduser()
+        if not case_dir.exists() or not case_dir.is_dir():
+            messagebox.showerror("読込失敗", f"source case フォルダが見つかりません。\n\n{case_dir}")
+            return
+
+        labels_path = case_dir / "roi_labels.json"
+        if not labels_path.exists():
+            messagebox.showerror("読込失敗", f"roi_labels.json が見つかりません。\n\n{labels_path}")
+            return
+
+        try:
+            doc = json.loads(labels_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            messagebox.showerror("読込失敗", str(exc))
+            return
+
+        labels = doc.get("labels")
+        if not isinstance(labels, list):
+            messagebox.showerror("読込失敗", "roi_labels.json の labels が配列ではありません。")
+            return
+
+        self._review_doc = doc
+        self._review_labels = [label for label in labels if isinstance(label, dict)]
+        self._review_index = 0
+        self._render_current_review_label()
+
+    def _render_current_review_label(self) -> None:
+        if not self._review_labels:
+            self.review_progress.set("0/0")
+            self.roi_id_label.configure(text="ROIなし")
+            self.roi_image_label.configure(image=None, text="ROI label がありません")
+            self._set_textbox_text(self.candidate_text, "", disabled=True)
+            self._set_textbox_text(self.label_text, "")
+            self.review_status.set("needs_labeling")
+            return
+
+        label = self._review_labels[self._review_index]
+        roi_id = str(label.get("roi_id", "-"))
+        image_rel = str(label.get("image", ""))
+        candidate = str(label.get("candidate_text", ""))
+        text = str(label.get("text", ""))
+        if not text and candidate:
+            text = candidate
+        status = str(label.get("status", "needs_labeling"))
+        if status not in {"needs_labeling", "needs_review", "verified", "skipped"}:
+            status = "needs_labeling"
+
+        self.roi_id_label.configure(text=roi_id)
+        self.review_progress.set(self._review_progress_text())
+        self.review_status.set(status)
+        self._set_textbox_text(self.candidate_text, candidate, disabled=True)
+        self._set_textbox_text(self.label_text, text)
+        self._render_roi_image(Path(self.review_case_dir.get()) / image_rel)
+
+    def _render_roi_image(self, image_path: Path) -> None:
+        if not image_path.exists():
+            self._review_image = None
+            self.roi_image_label.configure(image=None, text=f"画像が見つかりません\n{image_path.name}")
+            return
+        try:
+            image = Image.open(image_path)
+        except OSError as exc:
+            self._review_image = None
+            self.roi_image_label.configure(image=None, text=f"画像を開けません\n{exc}")
+            return
+
+        image.thumbnail((640, 420))
+        self._review_image = ctk.CTkImage(light_image=image, dark_image=image, size=image.size)
+        self.roi_image_label.configure(image=self._review_image, text="")
+
+    def _set_textbox_text(self, textbox: ctk.CTkTextbox, text: str, *, disabled: bool = False) -> None:
+        textbox.configure(state="normal")
+        textbox.delete("1.0", "end")
+        if text:
+            textbox.insert("1.0", text)
+        textbox.configure(state="disabled" if disabled else "normal")
+
+    def _review_progress_text(self) -> str:
+        total = len(self._review_labels)
+        verified = sum(1 for label in self._review_labels if label.get("status") == "verified")
+        return f"{self._review_index + 1}/{total}  verified {verified}/{total}"
+
+    def _copy_candidate_to_text(self) -> None:
+        if not self._review_labels:
+            return
+        candidate = self.candidate_text.get("1.0", "end").strip()
+        self._set_textbox_text(self.label_text, candidate)
+
+    def _previous_review_label(self) -> None:
+        if not self._review_labels:
+            return
+        self._store_current_review_label()
+        self._review_index = max(0, self._review_index - 1)
+        self._render_current_review_label()
+
+    def _next_review_label(self) -> None:
+        if not self._review_labels:
+            return
+        self._store_current_review_label()
+        self._review_index = min(len(self._review_labels) - 1, self._review_index + 1)
+        self._render_current_review_label()
+
+    def _store_current_review_label(self) -> None:
+        if not self._review_labels:
+            return
+        label = self._review_labels[self._review_index]
+        label["text"] = self.label_text.get("1.0", "end").strip()
+        label["status"] = self.review_status.get()
+
+    def _save_current_review_label(self) -> bool:
+        if not self._review_labels or self._review_doc is None:
+            messagebox.showerror("保存失敗", "保存する ROI label が読み込まれていません。")
+            return False
+        if self.review_status.get() == "verified" and not self.label_text.get("1.0", "end").strip():
+            messagebox.showerror(
+                "保存失敗",
+                "status を verified にする場合は、text（学習に使う確定文字列）を入力してください。",
+            )
+            return False
+        self._store_current_review_label()
+        labels_path = Path(self.review_case_dir.get()) / "roi_labels.json"
+        try:
+            labels_path.write_text(
+                json.dumps(self._review_doc, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+        except OSError as exc:
+            messagebox.showerror("保存失敗", str(exc))
+            return False
+        self.review_progress.set(self._review_progress_text())
+        return True
+
+    def _save_and_next_review_label(self) -> None:
+        if self._save_current_review_label():
+            self._next_review_label()
 
     def _select_image(self) -> None:
         path = filedialog.askopenfilename(
@@ -247,6 +595,7 @@ class SourceCaseCreatorGui(BaseApp):
                 self.overwrite.get(),
                 self.generate_variants.get(),
                 self.generate_ocr_candidates.get(),
+                self.vision_provider.get(),
                 self.vision_model.get().strip() or DEFAULT_MODEL,
                 api_key or None,
             ),
@@ -255,11 +604,13 @@ class SourceCaseCreatorGui(BaseApp):
         self._worker.start()
 
     def _request_api_key_if_needed(self) -> str | None:
-        if not self.generate_ocr_candidates.get() or os.getenv("ANTHROPIC_API_KEY"):
+        provider = self.vision_provider.get()
+        env_name = "OPENAI_API_KEY" if provider == PROVIDER_OPENAI else "ANTHROPIC_API_KEY"
+        if not self.generate_ocr_candidates.get() or os.getenv(env_name):
             return None
         api_key = simpledialog.askstring(
-            "Anthropic API key",
-            "OCR 候補生成に使う Anthropic API key を入力してください。\n"
+            f"{provider} API key",
+            f"OCR 候補生成に使う {provider} API key を入力してください。\n"
             "この key は保存せず、今回の実行中だけ使用します。",
             show="*",
             parent=self,
@@ -269,7 +620,7 @@ class SourceCaseCreatorGui(BaseApp):
         api_key = api_key.strip()
         if api_key:
             return api_key
-        messagebox.showerror("API key 未設定", "OCR 候補生成には Anthropic API key が必要です。")
+        messagebox.showerror("API key 未設定", f"OCR 候補生成には {provider} API key が必要です。")
         return ""
 
     def _worker_prepare(
@@ -280,6 +631,7 @@ class SourceCaseCreatorGui(BaseApp):
         overwrite: bool,
         generate_variants: bool,
         generate_ocr_candidates: bool,
+        vision_provider: str,
         vision_model: str,
         api_key: str | None,
     ) -> None:
@@ -296,9 +648,15 @@ class SourceCaseCreatorGui(BaseApp):
                 self._queue.put(("status", "ROI 短冊から OCR 候補テキストを生成中..."))
                 summary["vision_ocr"] = process_roi_strips(
                     Path(str(summary["roi_strips_dir"])),
+                    provider=vision_provider,
                     model=vision_model,
                     api_key=api_key,
+                    progress_callback=lambda current, total: self._queue.put(
+                        ("status", f"OCR 候補生成中... {current}/{total}")
+                    ),
                 )
+                self._queue.put(("status", "OCR 候補を roi_labels.json に同期中..."))
+                summary["roi_candidate_sync"] = sync_roi_ocr_candidates(Path(str(summary["case_dir"])))
         except Exception as exc:  # noqa: BLE001 - GUI boundary reports any failure to user.
             self._queue.put(("error", str(exc)))
             return
@@ -375,7 +733,7 @@ class SourceCaseCreatorGui(BaseApp):
                     "",
                     f"Case ID: {payload.get('case_id', '-')}",
                     f"ROI 短冊数: {payload.get('roi_count', '-')}",
-                    f"合成バリエーション画像数: {payload.get('variant_count', '-')}",
+                    f"学習用の水増し画像数: {payload.get('variant_count', '-')}",
                 ]
             ),
         )
@@ -383,6 +741,8 @@ class SourceCaseCreatorGui(BaseApp):
 
         case_dir = payload.get("case_dir")
         if case_dir:
+            self.review_case_dir.set(str(case_dir))
+            self._load_review_case()
             self.result_text.insert("insert", "Caseフォルダ: ")
             self._insert_result_link(Path(str(case_dir)).name, case_dir)
             self.result_text.insert("insert", "\n")
@@ -401,16 +761,28 @@ class SourceCaseCreatorGui(BaseApp):
             if vision_ocr.get("log_path"):
                 self._insert_result_file_line("OCR 実行ログ", vision_ocr["log_path"])
 
-        self.result_text.insert("insert", "\n確認するファイル:\n")
-        for label, key in [
-            ("expected.txt", "expected_text"),
-            ("rois.json", "rois"),
-            ("roi_strips", "roi_strips_dir"),
-            ("roi_labels.json", "roi_labels"),
+        candidate_sync = payload.get("roi_candidate_sync")
+        if isinstance(candidate_sync, dict):
+            self.result_text.insert(
+                "insert",
+                "roi_labels.json 候補同期: "
+                f"{candidate_sync.get('updated', 0)} 件更新 / "
+                f"{candidate_sync.get('unchanged', 0)} 件変更なし / "
+                f"{candidate_sync.get('missing', 0)} 件候補なし\n",
+            )
+
+        self.result_text.insert("insert", "\n次に確認するもの:\n")
+        for label, key, description in [
+            ("ROI確認タブ", "roi_labels", "短冊画像と candidate_text を見比べ、text/status を保存する"),
+            ("roi_strips", "roi_strips_dir", "候補 .txt と短冊画像の実ファイル。必要時のみ確認"),
+            ("expected.txt", "expected_text", "ページ全体の全文正解を確認する"),
+            ("rois.json", "rois", "ROI分割定義。必要時のみ確認"),
         ]:
             path = payload.get(key)
             if path:
-                self._insert_result_file_line(label, path)
+                self.result_text.insert("insert", f"- {label}: ")
+                self._insert_result_link(Path(str(path)).name, path)
+                self.result_text.insert("insert", f" - {description}\n")
 
 
 def main() -> int:
