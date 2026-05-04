@@ -15,6 +15,7 @@ dependencies = [
   "aist-guiparts>=0.2.0",
   "anthropic",
   "customtkinter",
+  "openai",
   "opencv-python",
   "Pillow",
 ]
@@ -39,6 +40,7 @@ lab-camera-ocr-gui = "ocr_wrapper.camera_ocr_gui:main"
 lab-ocr-generate-variants = "ocr_synthetic_data.generate_variants:main"
 lab-ocr-generate-roi-strips = "ocr_dataset.source_cases.generate_roi_strips:main"
 lab-ocr-vision-batch = "ocr_dataset.source_cases.vision_batch_ocr:main"
+lab-ocr-sync-roi-candidates = "ocr_dataset.source_cases.sync_roi_candidates:main"
 lab-ocr-prepare-source-case = "ocr_dataset.source_cases.prepare_source_case:main"
 lab-ocr-source-case-gui = "ocr_dataset.source_cases.source_case_gui:main"
 

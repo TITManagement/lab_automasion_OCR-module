@@ -26,7 +26,13 @@ from typing import Any
 from ocr_dataset.paths import dataset_root, resolve_dataset_path
 
 
-DEFAULT_MODEL = "claude-sonnet-4-6"
+PROVIDER_ANTHROPIC = "Anthropic"
+PROVIDER_OPENAI = "OpenAI"
+VISION_PROVIDERS = [PROVIDER_ANTHROPIC, PROVIDER_OPENAI]
+ANTHROPIC_MODELS = ["claude-sonnet-4-6", "claude-opus-4-5"]
+OPENAI_MODELS = ["gpt-5.4-mini", "gpt-5.5", "gpt-5.4", "gpt-5.4-nano", "gpt-4.1", "gpt-4.1-mini"]
+DEFAULT_PROVIDER = PROVIDER_ANTHROPIC
+DEFAULT_MODEL = ANTHROPIC_MODELS[0]
 SUMMARY_FILE_NAME = "vision_ocr_summary.json"
 LOG_FILE_NAME = "vision_ocr.log"
 TRANSCRIPTION_PROMPT = (
@@ -121,10 +127,19 @@ def _print_and_log(log_path: Path | None, message: str) -> None:
     _write_log(log_path, message)
 
 
-def _run_metadata(source_path: Path, model: str, start_strip: int, end_strip: int, dry_run: bool) -> dict[str, Any]:
+def _run_metadata(
+    source_path: Path,
+    *,
+    provider: str,
+    model: str,
+    start_strip: int,
+    end_strip: int,
+    dry_run: bool,
+) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "source_dir": _portable_dataset_path(source_path),
+        "provider": provider,
         "model": model,
         "prompt_version": PROMPT_VERSION,
         "prompt_sha256": hashlib.sha256(TRANSCRIPTION_PROMPT.encode("utf-8")).hexdigest(),
@@ -132,11 +147,12 @@ def _run_metadata(source_path: Path, model: str, start_strip: int, end_strip: in
         "dry_run": dry_run,
         "python": platform.python_version(),
         "anthropic_package": _package_version("anthropic"),
+        "openai_package": _package_version("openai"),
     }
 
 
-def transcribe_image(client: Any, image_path: Path, *, model: str = DEFAULT_MODEL) -> str:
-    """1枚の ROI 短冊画像からテキスト候補を生成する。"""
+def transcribe_image_anthropic(client: Any, image_path: Path, *, model: str = DEFAULT_MODEL) -> str:
+    """Anthropic vision API で1枚の ROI 短冊画像からテキスト候補を生成する。"""
     message = client.messages.create(
         model=model,
         max_tokens=1024,
@@ -163,21 +179,72 @@ def transcribe_image(client: Any, image_path: Path, *, model: str = DEFAULT_MODE
     return _text_from_message_content(message.content).strip()
 
 
+def transcribe_image_openai(client: Any, image_path: Path, *, model: str) -> str:
+    """OpenAI Responses API で1枚の ROI 短冊画像からテキスト候補を生成する。"""
+    image_url = f"data:{_media_type(image_path)};base64,{encode_image_to_base64(image_path)}"
+    response = client.responses.create(
+        model=model,
+        max_output_tokens=1024,
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": TRANSCRIPTION_PROMPT},
+                    {"type": "input_image", "image_url": image_url},
+                ],
+            }
+        ],
+    )
+    output_text = getattr(response, "output_text", None)
+    if output_text is not None:
+        return str(output_text).strip()
+    return str(response).strip()
+
+
+def _normalize_provider(provider: str) -> str:
+    provider_lower = provider.strip().lower()
+    if provider_lower == "openai":
+        return PROVIDER_OPENAI
+    if provider_lower == "anthropic":
+        return PROVIDER_ANTHROPIC
+    raise ValueError(f"unsupported vision provider: {provider}")
+
+
+def _build_client(provider: str, api_key: str | None) -> Any:
+    if provider == PROVIDER_OPENAI:
+        try:
+            from openai import OpenAI
+        except ImportError as exc:
+            raise RuntimeError("openai package is required. Install with `python -m pip install openai`.") from exc
+        return OpenAI(api_key=api_key) if api_key else OpenAI()
+
+    try:
+        from anthropic import Anthropic
+    except ImportError as exc:
+        raise RuntimeError("anthropic package is required. Install with `python -m pip install anthropic`.") from exc
+    return Anthropic(api_key=api_key) if api_key else Anthropic()
+
+
+def transcribe_image(client: Any, image_path: Path, *, provider: str, model: str = DEFAULT_MODEL) -> str:
+    """指定 provider の vision API で1枚の ROI 短冊画像からテキスト候補を生成する。"""
+    if provider == PROVIDER_OPENAI:
+        return transcribe_image_openai(client, image_path, model=model)
+    return transcribe_image_anthropic(client, image_path, model=model)
+
+
 def process_roi_strips(
     source_dir: Path,
     *,
     start_strip: int = 1,
     end_strip: int | None = None,
     dry_run: bool = False,
+    provider: str = DEFAULT_PROVIDER,
     model: str = DEFAULT_MODEL,
     api_key: str | None = None,
+    progress_callback: Any | None = None,
 ) -> dict[str, Any]:
     """ROI 短冊画像を一括 OCR し、同名 `.txt` へ保存する。"""
-    try:
-        from anthropic import Anthropic
-    except ImportError as exc:
-        raise RuntimeError("anthropic package is required. Install with `python -m pip install anthropic`.") from exc
-
+    provider = _normalize_provider(provider)
     source_path = resolve_dataset_path(source_dir)
     if not source_path.exists():
         raise FileNotFoundError(f"directory not found: {source_path}")
@@ -188,7 +255,7 @@ def process_roi_strips(
     if end_strip is None:
         end_strip = max(strip_numbers, default=start_strip)
 
-    client = Anthropic(api_key=api_key) if api_key else Anthropic()
+    client = _build_client(provider, api_key)
     processed = 0
     skipped = 0
     errors = 0
@@ -199,9 +266,11 @@ def process_roi_strips(
     if log_path is not None:
         log_path.write_text("", encoding="utf-8")
 
-    _print_and_log(log_path, f"Started vision OCR: model={model}, source_dir={source_path}")
+    _print_and_log(log_path, f"Started vision OCR: provider={provider}, model={model}, source_dir={source_path}")
 
     for strip_num in range(start_strip, end_strip + 1):
+        if progress_callback is not None:
+            progress_callback(strip_num, end_strip)
         jpg_file = source_path / f"strip_{strip_num:04d}.jpg"
         txt_file = source_path / f"strip_{strip_num:04d}.txt"
         strip_name = jpg_file.name
@@ -230,7 +299,7 @@ def process_roi_strips(
         print(f"Processing {strip_name}...", end=" ", flush=True)
         strip_start = time.perf_counter()
         try:
-            text = transcribe_image(client, jpg_file, model=model)
+            text = transcribe_image(client, jpg_file, provider=provider, model=model)
             elapsed_ms = round((time.perf_counter() - strip_start) * 1000)
             record["elapsed_ms"] = elapsed_ms
             record["text_chars"] = len(text)
@@ -246,7 +315,7 @@ def process_roi_strips(
                 record["status"] = "processed"
                 processed += 1
         except Exception as exc:  # noqa: BLE001 - batch CLI reports each failed strip and continues.
-            if _is_model_not_found_error(exc, model):
+            if provider == PROVIDER_ANTHROPIC and _is_model_not_found_error(exc, model):
                 raise RuntimeError(
                     f"Anthropic model '{model}' was not found. Select an available vision model and retry."
                 ) from exc
@@ -261,7 +330,14 @@ def process_roi_strips(
 
     finished_at = _utc_now()
     summary: dict[str, Any] = {
-        **_run_metadata(source_path, model, start_strip, end_strip, dry_run),
+        **_run_metadata(
+            source_path,
+            provider=provider,
+            model=model,
+            start_strip=start_strip,
+            end_strip=end_strip,
+            dry_run=dry_run,
+        ),
         "started_at": started_at,
         "finished_at": finished_at,
         "elapsed_ms": round((time.perf_counter() - run_start) * 1000),
@@ -306,18 +382,26 @@ def main() -> int:
         default=None,
         help="Ending strip number. Defaults to the largest strip_XXXX.jpg found.",
     )
-    parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Anthropic model name. Defaults to {DEFAULT_MODEL}.")
+    parser.add_argument(
+        "--provider",
+        default=DEFAULT_PROVIDER,
+        choices=VISION_PROVIDERS,
+        help=f"Vision API provider. Defaults to {DEFAULT_PROVIDER}.",
+    )
+    parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Vision model name. Defaults to {DEFAULT_MODEL}.")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be done without saving.")
     args = parser.parse_args()
 
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        parser.error("ANTHROPIC_API_KEY environment variable is required.")
+    required_env = "OPENAI_API_KEY" if args.provider == PROVIDER_OPENAI else "ANTHROPIC_API_KEY"
+    if not os.getenv(required_env):
+        parser.error(f"{required_env} environment variable is required.")
 
     process_roi_strips(
         args.source_dir,
         start_strip=args.start,
         end_strip=args.end,
         dry_run=args.dry_run,
+        provider=args.provider,
         model=args.model,
     )
     return 0
