@@ -12,7 +12,7 @@
 
 ## 1. 概要
 
-この設計書は、`lab_automasion_OCR-module` で PaddleOCR を支援するために外側レイヤーへ追加したアルゴリズムを整理する。
+この設計書は、`lab_automation_OCR-module` で PaddleOCR を支援するために外側レイヤーへ追加したアルゴリズムを整理する。
 
 本モジュールでは、PaddleOCR 本体を直接変更せず、以下の支援処理でカメラOCRの実用性を上げる。
 

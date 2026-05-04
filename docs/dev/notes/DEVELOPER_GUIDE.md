@@ -12,7 +12,7 @@
 
 ## 1. 概要
 
-本書は、`lab_automasion_OCR-module` の開発時に参照する docstring / comment 規約を定義する。
+本書は、`lab_automation_OCR-module` の開発時に参照する docstring / comment 規約を定義する。
 
 この規約は、AiLab の既存標準を本リポジトリ内で運用できるように引用・要約したものである。単独 clone された環境では、本書を正本として扱う。
 

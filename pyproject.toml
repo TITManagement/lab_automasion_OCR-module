@@ -3,7 +3,7 @@ requires = ["setuptools>=61", "packaging>=23"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lab-automasion-ocr-module"
+name = "lab-automation-ocr-module"
 version = "0.1.0"
 description = "Non-invasive Camera OCR wrapper for PaddleOCR"
 readme = "README.md"
@@ -26,9 +26,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/TITManagement/lab_automasion_OCR-module"
-Repository = "https://github.com/TITManagement/lab_automasion_OCR-module"
-Documentation = "https://github.com/TITManagement/lab_automasion_OCR-module#readme"
+Homepage = "https://github.com/TITManagement/lab_automation_OCR-module"
+Repository = "https://github.com/TITManagement/lab_automation_OCR-module"
+Documentation = "https://github.com/TITManagement/lab_automation_OCR-module#readme"
 
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.6", "mypy>=1.8"]

@@ -4,7 +4,7 @@ set -euo pipefail
 # Offline-first execution wrapper for paddleocr CLI.
 # Location: _post_clone_assets/security_ops/scripts/  (outside PaddleOCR tree)
 #
-# Usage (from lab_automasion_OCR-module root):
+# Usage (from lab_automation_OCR-module root):
 #   _post_clone_assets/security_ops/scripts/run_paddleocr_offline.sh ocr -i ./doc.png --lang japan
 #
 # Strict offline mode (default):

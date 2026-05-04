@@ -1,4 +1,4 @@
-# AGENTS.md (lab_automasion_OCR-module Local)
+# AGENTS.md (lab_automation_OCR-module Local)
 
 <!-- AGENTS_BASE_SOURCE: ../../AGENTS.md -->
 <!-- AGENTS_BASE_SHA256: local-delta -->
@@ -20,7 +20,7 @@
 - README標準: [../../README_STANDARD.md](../../README_STANDARD.md)
 - docstring / comment 規約: [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md)
 
-このファイルには、`lab_automasion_OCR-module` 固有の差分だけを書く。
+このファイルには、`lab_automation_OCR-module` 固有の差分だけを書く。
 
 ## モジュール固有ルール
 
