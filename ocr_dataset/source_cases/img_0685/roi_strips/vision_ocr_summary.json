@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "source_dir": "source_cases/img_0685/roi_strips",
+  "provider": "Anthropic",
+  "model": "claude-sonnet-4-6",
+  "prompt_version": "roi-strip-transcription-v1",
+  "prompt_sha256": "0b0f41786b0f1070f8425f90a898c2f2bd509ac04c2009ffc2d33f40ee6ccc5d",
+  "range": {
+    "start": 1,
+    "end": 11
+  },
+  "dry_run": false,
+  "python": "3.11.8",
+  "anthropic_package": "0.97.0",
+  "openai_package": "2.33.0",
+  "started_at": "2026-05-04T21:16:15Z",
+  "finished_at": "2026-05-04T21:16:41Z",
+  "elapsed_ms": 26126,
+  "processed": 11,
+  "skipped": 0,
+  "errors": 0,
+  "records": [
+    {
+      "strip": 1,
+      "image": "strip_0001.jpg",
+      "output_txt": "strip_0001.txt",
+      "status": "processed",
+      "image_bytes": 60307,
+      "image_sha256": "acd9c4728aea17966f7e49915c5d92da5ed295e53a1848f411c6f06afe101695",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 4032,
+        "height": 78
+      },
+      "elapsed_ms": 3925,
+      "text_chars": 69,
+      "text_sha256": "05ee2eded289ca860e94d0b3b25703a39f83e82acdaf5a07b2f066cbf31e2a5d"
+    },
+    {
+      "strip": 2,
+      "image": "strip_0002.jpg",
+      "output_txt": "strip_0002.txt",
+      "status": "processed",
+      "image_bytes": 81425,
+      "image_sha256": "bb0db6f4e22b803dbed583a26fdc2bf68d63f52242b3364b7cd3b3709cbe3cb4",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3768,
+        "height": 97
+      },
+      "elapsed_ms": 1923,
+      "text_chars": 45,
+      "text_sha256": "6f6c297d8cf360570dddcdb8e1408a287585abb21263bb96923a35e54ae9f176"
+    },
+    {
+      "strip": 3,
+      "image": "strip_0003.jpg",
+      "output_txt": "strip_0003.txt",
+      "status": "processed",
+      "image_bytes": 335722,
+      "image_sha256": "8f1913f1c6d22c0e4428428c4f6bb0d8e9e1d21d25ff190a5cf127ed85732f42",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3874,
+        "height": 388
+      },
+      "elapsed_ms": 2548,
+      "text_chars": 47,
+      "text_sha256": "5a1c48ed2a8075668195ac327d9ca20ddaeb41e9fe2447d258d1e2d2d9eb3179"
+    },
+    {
+      "strip": 4,
+      "image": "strip_0004.jpg",
+      "output_txt": "strip_0004.txt",
+      "status": "processed",
+      "image_bytes": 53420,
+      "image_sha256": "06d39d35b65588f0c99dce6e44f2b2389244acae2bdc2006c3d5d628dbec5921",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3832,
+        "height": 59
+      },
+      "elapsed_ms": 2047,
+      "text_chars": 28,
+      "text_sha256": "6595b44b1a31f3536a5de978720ced0fabbbaef6a8d617e7cf2f7a8ed694aa31"
+    },
+    {
+      "strip": 5,
+      "image": "strip_0005.jpg",
+      "output_txt": "strip_0005.txt",
+      "status": "processed",
+      "image_bytes": 186641,
+      "image_sha256": "e197edd82497f8fa58f2aafc75aa3c73e51dcb6e09fbe1560faab79aa2c27858",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3987,
+        "height": 204
+      },
+      "elapsed_ms": 1650,
+      "text_chars": 13,
+      "text_sha256": "1a2a9c44a78e14ae0fa796a3d3dde4e82efc462cdf3a8f0d3d406a3d8e3ea962"
+    },
+    {
+      "strip": 6,
+      "image": "strip_0006.jpg",
+      "output_txt": "strip_0006.txt",
+      "status": "processed",
+      "image_bytes": 83410,
+      "image_sha256": "1f256b30256693bd777f774be80ef175b533e025a0fa89ca75a97f1c434bec66",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3995,
+        "height": 107
+      },
+      "elapsed_ms": 2443,
+      "text_chars": 44,
+      "text_sha256": "334f9467a6d32fa10c6975ba14fd846194dff2867cea45ae3757d5709c45d0c3"
+    },
+    {
+      "strip": 7,
+      "image": "strip_0007.jpg",
+      "output_txt": "strip_0007.txt",
+      "status": "processed",
+      "image_bytes": 243491,
+      "image_sha256": "13128ae5e69bc0034ae9aba39d333a379922e57158b0b0cabc160c52dfd3dbb7",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3995,
+        "height": 237
+      },
+      "elapsed_ms": 1736,
+      "text_chars": 21,
+      "text_sha256": "041fb5e0f38b06ef09e561ebdfe087f1aace0ca0a2e364cad33eb307275b590c"
+    },
+    {
+      "strip": 8,
+      "image": "strip_0008.jpg",
+      "output_txt": "strip_0008.txt",
+      "status": "processed",
+      "image_bytes": 251008,
+      "image_sha256": "e6a06b59304ccc13f629786b4047cd084fc28b7dd52844d52fd1a7a5e3a7c633",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 4006,
+        "height": 241
+      },
+      "elapsed_ms": 1644,
+      "text_chars": 21,
+      "text_sha256": "988149f2647c99af177695d9067c0aca6f0a1034a8ef26b5fb37e4466667f522"
+    },
+    {
+      "strip": 9,
+      "image": "strip_0009.jpg",
+      "output_txt": "strip_0009.txt",
+      "status": "processed",
+      "image_bytes": 115166,
+      "image_sha256": "ca5034eca580cd2f5257320f237f2b53b028b58f3a3490755f71e741f3362808",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 2433,
+        "height": 205
+      },
+      "elapsed_ms": 1455,
+      "text_chars": 13,
+      "text_sha256": "1c42d48ba27c62feb3b50a254ffe6b47c46b693a8102a378d23730e35029db57"
+    },
+    {
+      "strip": 10,
+      "image": "strip_0010.jpg",
+      "output_txt": "strip_0010.txt",
+      "status": "processed",
+      "image_bytes": 175553,
+      "image_sha256": "4f8a4bee865dd18ca46d0a1fcbcf9b136043c08b265e0db091fcbdd9686dfa79",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 4032,
+        "height": 160
+      },
+      "elapsed_ms": 3551,
+      "text_chars": 45,
+      "text_sha256": "1d7d292919d320c802e384f4a1ea037a1f457ce50963dc027fee12e70f779b7e"
+    },
+    {
+      "strip": 11,
+      "image": "strip_0011.jpg",
+      "output_txt": "strip_0011.txt",
+      "status": "processed",
+      "image_bytes": 48899,
+      "image_sha256": "a2ee422ea9fee6c1279604c7bb8d5054c609a68f73266470643d8ba90fb10f82",
+      "media_type": "image/jpeg",
+      "image_size": {
+        "width": 3746,
+        "height": 75
+      },
+      "elapsed_ms": 3170,
+      "text_chars": 90,
+      "text_sha256": "ad5e29d1740e7f53bd4e8b2c8579fffa826e05c8ac5cf35ab66e69ad420baf08"
+    }
+  ],
+  "summary_path": "source_cases/img_0685/roi_strips/vision_ocr_summary.json",
+  "log_path": "source_cases/img_0685/roi_strips/vision_ocr.log"
+}
