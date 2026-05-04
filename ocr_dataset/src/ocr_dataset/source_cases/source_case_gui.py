@@ -45,52 +45,63 @@ class SourceCaseCreatorGui(ctk.CTk):
     def _build_ui(self) -> None:
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(3, weight=3)
-        self.grid_rowconfigure(6, weight=2)
+        self.grid_rowconfigure(7, weight=2)
 
         title = ctk.CTkLabel(self, text="Source Case Creator", font=ctk.CTkFont(size=22, weight="bold"))
         title.grid(row=0, column=0, padx=18, pady=(18, 8), sticky="w")
 
-        form = ctk.CTkFrame(self)
-        form.grid(row=1, column=0, padx=18, pady=8, sticky="ew")
-        form.grid_columnconfigure(1, weight=1)
+        input_frame = ctk.CTkFrame(self)
+        input_frame.grid(row=1, column=0, padx=18, pady=8, sticky="ew")
+        input_frame.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(form, text="Image").grid(row=0, column=0, padx=12, pady=12, sticky="w")
-        ctk.CTkEntry(form, textvariable=self.image_path).grid(row=0, column=1, padx=8, pady=12, sticky="ew")
-        ctk.CTkButton(form, text="Select", command=self._select_image, width=110).grid(row=0, column=2, padx=12, pady=12)
-
-        ctk.CTkLabel(form, text="Case ID").grid(row=1, column=0, padx=12, pady=12, sticky="w")
-        ctk.CTkEntry(form, textvariable=self.case_id, placeholder_text="img_0678").grid(
-            row=1, column=1, padx=8, pady=12, sticky="ew"
+        ctk.CTkLabel(input_frame, text="Input Files", font=ctk.CTkFont(weight="bold")).grid(
+            row=0, column=0, padx=12, pady=(12, 4), sticky="w"
         )
-        ctk.CTkCheckBox(form, text="Overwrite existing case", variable=self.overwrite).grid(
-            row=1, column=2, padx=12, pady=12, sticky="w"
-        )
-
-        ctk.CTkCheckBox(form, text="Generate synthetic variants", variable=self.generate_variants).grid(
-            row=2, column=1, padx=8, pady=(0, 12), sticky="w"
+        ctk.CTkLabel(input_frame, text="Source Image").grid(row=1, column=0, padx=12, pady=12, sticky="w")
+        ctk.CTkEntry(input_frame, textvariable=self.image_path).grid(row=1, column=1, padx=8, pady=12, sticky="ew")
+        ctk.CTkButton(input_frame, text="Select", command=self._select_image, width=110).grid(
+            row=1, column=2, padx=12, pady=12
         )
 
         expected_header = ctk.CTkFrame(self, fg_color="transparent")
         expected_header.grid(row=2, column=0, padx=18, pady=(12, 4), sticky="ew")
         expected_header.grid_columnconfigure(0, weight=1)
-        ctk.CTkLabel(expected_header, text="Expected Text").grid(row=0, column=0, sticky="w")
-        ctk.CTkButton(expected_header, text="Load Text", command=self._load_expected_text, width=120).grid(
+        ctk.CTkLabel(expected_header, text="Expected Text Preview").grid(row=0, column=0, sticky="w")
+        ctk.CTkButton(expected_header, text="Load Expected Text", command=self._load_expected_text, width=160).grid(
             row=0, column=1, sticky="e"
         )
         self.expected_text = ctk.CTkTextbox(self, wrap="word", height=220)
         self.expected_text.grid(row=3, column=0, padx=18, pady=4, sticky="nsew")
 
+        output_frame = ctk.CTkFrame(self)
+        output_frame.grid(row=4, column=0, padx=18, pady=8, sticky="ew")
+        output_frame.grid_columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(output_frame, text="Output Case", font=ctk.CTkFont(weight="bold")).grid(
+            row=0, column=0, padx=12, pady=(12, 4), sticky="w"
+        )
+        ctk.CTkLabel(output_frame, text="Case ID").grid(row=1, column=0, padx=12, pady=12, sticky="w")
+        ctk.CTkEntry(output_frame, textvariable=self.case_id, placeholder_text="img_0678").grid(
+            row=1, column=1, padx=8, pady=12, sticky="ew"
+        )
+        ctk.CTkCheckBox(output_frame, text="Overwrite existing case", variable=self.overwrite).grid(
+            row=1, column=2, padx=12, pady=12, sticky="w"
+        )
+        ctk.CTkCheckBox(output_frame, text="Generate synthetic variants", variable=self.generate_variants).grid(
+            row=2, column=1, padx=8, pady=(0, 12), sticky="w"
+        )
+
         controls = ctk.CTkFrame(self)
-        controls.grid(row=4, column=0, padx=18, pady=8, sticky="ew")
+        controls.grid(row=5, column=0, padx=18, pady=8, sticky="ew")
         controls.grid_columnconfigure(1, weight=1)
         self.run_button = ctk.CTkButton(controls, text="Prepare Source Case", command=self._run_prepare, width=200)
         self.run_button.grid(row=0, column=0, padx=12, pady=12)
         self.status_label = ctk.CTkLabel(controls, text="Ready")
         self.status_label.grid(row=0, column=1, padx=12, pady=12, sticky="w")
 
-        ctk.CTkLabel(self, text="Result").grid(row=5, column=0, padx=18, pady=(12, 4), sticky="w")
+        ctk.CTkLabel(self, text="Result").grid(row=6, column=0, padx=18, pady=(12, 4), sticky="w")
         self.result_text = ctk.CTkTextbox(self, wrap="none", height=160)
-        self.result_text.grid(row=6, column=0, padx=18, pady=(4, 18), sticky="nsew")
+        self.result_text.grid(row=7, column=0, padx=18, pady=(4, 18), sticky="nsew")
 
     def _select_image(self) -> None:
         path = filedialog.askopenfilename(
