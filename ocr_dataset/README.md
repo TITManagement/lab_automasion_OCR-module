@@ -104,7 +104,7 @@ GUI で source case を作成する例:
 lab-ocr-source-case-gui
 ```
 
-GUI では、元画像、case ID、画像全体の正解文字列を入力します。実行すると、元画像のコピー、`expected.txt` 保存、`rois.json` 生成、`roi_labels.json` 初期生成、`variants/` 生成をまとめて行います。
+GUI では、事前に確認済みの元画像と画像全体の正解文字列を入力し、case ID を指定して source case assets を作成します。実行すると、元画像のコピー、`expected.txt` 保存、`rois.json` 生成、`roi_labels.json` 初期生成、`variants/` 生成をまとめて行います。必要に応じて `Generate OCR candidate .txt files from ROI strips` を有効にすると、生成した ROI 短冊から `.txt` 候補も続けて作成します。作成後に `expected.txt`、`rois.json`、`roi_strips/`、`roi_labels.json` を確認し、ROI ごとのラベル整備へ進みます。
 
 ## 学習準備プロセス
 
@@ -118,6 +118,7 @@ GUI では、元画像、case ID、画像全体の正解文字列を入力しま
 IMG_0678.jpg
   -> expected.txt を人が確認して整備
   -> rois.json を生成または調整
+  -> roi_strips/ から OCR 候補テキストを生成
   -> roi_labels.json に ROI ごとの正解文字列を入力
   -> variants/ を生成
   -> PaddleOCR 学習形式へ export
@@ -136,6 +137,8 @@ IMG_0678.jpg
 lab-ocr-source-case-gui
 ```
 
+GUI 内で `Generate OCR candidate .txt files from ROI strips` を有効にすると、source case 作成後に ROI 短冊 OCR 候補生成まで続けて実行できます。この機能には `ANTHROPIC_API_KEY` が必要です。
+
 ### 2. ROI 短冊を生成する
 
 ROI 定義は [source_cases/img_0678/rois.json](source_cases/img_0678/rois.json) に保存します。人が分割単位を確認できるよう、同時に `source_cases/img_0678/roi_strips/strip_XXXX.jpg` も生成します。
@@ -146,7 +149,18 @@ lab-ocr-generate-roi-strips source_cases/img_0678
 
 `rois.json` には `source_image`、画像サイズ、短冊ごとの座標、短冊画像への相対パスを保存します。`IMG_0678.jpg` から生成した場合、`source_image` は `IMG_0678.jpg` になります。
 
-### 3. ROI ごとの正解ラベルを整備する
+### 3. ROI 短冊の OCR 候補を生成する
+
+`roi_strips/strip_XXXX.jpg` から同名の `.txt` を生成し、ROI ごとのラベル入力候補として使えます。
+
+```bash
+export ANTHROPIC_API_KEY="..."
+lab-ocr-vision-batch ocr_dataset/source_cases/img_0678/roi_strips
+```
+
+この出力は候補です。画像と照合してから `roi_labels.json` に反映します。
+
+### 4. ROI ごとの正解ラベルを整備する
 
 ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_cases/img_0678/roi_labels.json) に保存します。
 
@@ -172,7 +186,7 @@ ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_c
 lab-ocr-prepare-source-case source_cases/img_0678
 ```
 
-### 4. Synthetic variants を生成する
+### 5. Synthetic variants を生成する
 
 明るさ、ぼけ、回転などの揺らぎ画像は [../ocr_synthetic_data](../ocr_synthetic_data/) 側で生成します。
 
@@ -182,13 +196,13 @@ lab-ocr-generate-variants source_cases/img_0678
 
 生成物は `source_cases/img_0678/variants/` に保存されます。`variants/` は再生成可能な派生データなので git 管理対象外です。
 
-### 5. PaddleOCR 学習形式へ export する
+### 6. PaddleOCR 学習形式へ export する
 
 PaddleOCR の認識モデルを学習するには、最終的に PaddleOCR が要求する label file と画像ディレクトリへ変換する必要があります。
 
 この export は今後 [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) に実装します。現時点では境界だけを固定し、誤って未完成の export を学習に使わないよう `NotImplementedError` にしています。
 
-### 6. PaddleOCR 側で fine-tuning する
+### 7. PaddleOCR 側で fine-tuning する
 
 学習実行は [../vendor/PaddleOCR](../vendor/PaddleOCR/) 側の責務です。このリポジトリでは PaddleOCR 本体を直接改変せず、source case、ROI、variants、export までを管理します。
 

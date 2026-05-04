@@ -1,15 +1,17 @@
 {
-  "generated_at": "2026-05-03T18:26:26.071173",
+  "generated_at": "2026-05-04T17:18:52.575505",
   "docs_root": "/Users/tinoue/Development.local/app/AiLab/lab_automation_module/lab_automasion_OCR-module/docs",
   "toc_file": "/Users/tinoue/Development.local/app/AiLab/lab_automation_module/lab_automasion_OCR-module/README.md",
-  "chapter_count": 3,
+  "chapter_count": 4,
   "chapters": [
     "README.md",
     "ocr_support_algorithm_design.md",
+    "ocr_source_case_workflow.md",
     "dev/notes/DEVELOPER_GUIDE.md"
   ],
   "duplicate_chapters": [
     "dev/notes/DEVELOPER_GUIDE.md",
+    "ocr_source_case_workflow.md",
     "ocr_support_algorithm_design.md"
   ],
   "missing_chapters": [],
