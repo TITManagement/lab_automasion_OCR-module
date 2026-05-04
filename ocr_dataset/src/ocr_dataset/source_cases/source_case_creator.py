@@ -37,6 +37,12 @@ def validate_case_id(case_id: str) -> str:
     return normalized
 
 
+def _is_same_file(left: Path, right: Path) -> bool:
+    if not left.exists() or not right.exists():
+        return False
+    return left.resolve() == right.resolve()
+
+
 def create_source_case(
     *,
     image_path: Path,
@@ -59,14 +65,21 @@ def create_source_case(
     case_dir.mkdir(parents=True, exist_ok=True)
 
     destination_image = case_dir / source_image.name
-    if destination_image.exists() and not overwrite:
+    image_reused = False
+    if _is_same_file(source_image, destination_image):
+        image_reused = True
+    elif destination_image.exists() and not overwrite:
         raise FileExistsError(f"source image already exists: {destination_image}")
-    shutil.copy2(source_image, destination_image)
+    else:
+        shutil.copy2(source_image, destination_image)
 
     expected_path = case_dir / "expected.txt"
+    normalized_expected = expected_text.rstrip() + "\n"
+    expected_reused = False
     if expected_path.exists() and not overwrite:
-        raise FileExistsError(f"expected.txt already exists: {expected_path}")
-    expected_path.write_text(expected_text.rstrip() + "\n", encoding="utf-8")
+        expected_reused = True
+    else:
+        expected_path.write_text(normalized_expected, encoding="utf-8")
 
     fields_path = case_dir / "expected_fields.json"
     if not fields_path.exists():
@@ -82,7 +95,9 @@ def create_source_case(
         "case_id": normalized_case_id,
         "case_dir": str(case_dir),
         "source_image": str(destination_image),
+        "source_image_reused": image_reused,
         "expected_text": str(expected_path),
+        "expected_text_reused": expected_reused,
         "expected_fields": str(fields_path),
         "rois": str(case_dir / "rois.json"),
         "roi_strips_dir": str(case_dir / "roi_strips"),
