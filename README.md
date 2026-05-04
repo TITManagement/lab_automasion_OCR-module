@@ -85,7 +85,7 @@ git clone https://github.com/PaddlePaddle/PaddleOCR.git vendor/PaddleOCR
 - OCR結果の Corrected / Raw 並列表示
 - Auto / Off / Basic / Context の OCR 後処理モード
 - 郵便番号、TEL/FAX、URL、英数字記号、mojibake の安全寄り後処理
-- OCR 評価・学習向け source case 管理と synthetic variants 生成
+- OCR 評価・学習向け source case 管理と学習用の水増し画像生成
 - OCR Source Case Builder GUI
 - ROI 短冊からの OCR 候補 `.txt` 生成
 - ROI OCR 実行結果の JSON / log 記録
@@ -130,6 +130,7 @@ lab-camera-ocr
 lab-ocr --image ./sample.png --out ./sample_result.json --lang japan
 lab-ocr-generate-roi-strips source_cases/img_0678
 lab-ocr-vision-batch source_cases/img_0678/roi_strips
+lab-ocr-sync-roi-candidates source_cases/img_0678
 lab-ocr-prepare-source-case source_cases/img_0678
 lab-ocr-source-case-gui
 lab-ocr-generate-variants source_cases/img_0678
@@ -142,13 +143,13 @@ source .venv_OCR/bin/activate
 lab-ocr-source-case-gui
 ```
 
-この GUI は、OCR 学習用元画像と画像全体の全文正解テキストから、1つの source case を作成します。作成対象は、元画像コピー、`expected.txt`、`rois.json`、`roi_strips/`、`roi_labels.json`、必要に応じた `variants/` と ROI OCR 候補 `.txt` です。
+この GUI は、OCR 学習用元画像と画像全体の全文正解テキストから、1つの source case を作成します。作成対象は、元画像コピー、`expected.txt`、`rois.json`、`roi_strips/`、`roi_labels.json`、必要に応じた `variants/` と ROI OCR 候補 `.txt` です。作成後は同じGUI内の `ROI確認` タブで短冊画像、`candidate_text`、確定用 `text`、`status` を確認・保存できます。
 
-`ROI 短冊から OCR 候補 .txt を生成` を有効にした場合だけ、Vision model による候補生成を実行します。この処理には Anthropic API key が必要です。環境変数 `ANTHROPIC_API_KEY` が設定済みならそれを使い、未設定なら実行時モーダルで入力します。入力された API key は保存しません。
+`ROI 短冊から OCR 候補 .txt を生成` を有効にした場合だけ、Vision provider / model による候補生成を実行します。Provider は `Anthropic` または `OpenAI` から選択できます。OpenAI を選ぶと `gpt-5.4-mini`、`gpt-5.5`、`gpt-5.4`、`gpt-5.4-nano`、`gpt-4.1`、`gpt-4.1-mini` を選択できます。環境変数 `ANTHROPIC_API_KEY` または `OPENAI_API_KEY` が設定済みならそれを使い、未設定なら実行時モーダルで入力します。入力された API key は保存しません。
 
-ROI OCR 候補生成の結果は、`roi_strips/vision_ocr_summary.json` と `roi_strips/vision_ocr.log` に保存します。これらは PaddleOCR へ直接渡す学習入力ではなく、候補生成の再現性、監査、再実行判断、品質確認に使う情報です。
+ROI OCR 候補生成の結果は、`roi_strips/vision_ocr_summary.json` と `roi_strips/vision_ocr.log` に保存します。候補 `.txt` は `roi_labels.json` の `candidate_text` にも同期します。これらは PaddleOCR へ直接渡す学習入力ではなく、候補生成の再現性、監査、再実行判断、品質確認に使う情報です。
 
-PaddleOCR へ最終的に渡す recognition dataset は、`roi_labels.json` で人が確認し `verified` にした ROI ラベルから export します。Vision OCR の `.txt` 候補を未確認のまま学習に使ってはいけません。詳細は [docs/ocr_source_case_workflow.md](docs/ocr_source_case_workflow.md) を参照してください。
+PaddleOCR へ最終的に渡す recognition dataset は、`roi_labels.json` で人が確認し `verified` にした ROI ラベルから export します。Vision OCR の `.txt` 候補や `candidate_text` を未確認のまま学習に使ってはいけません。詳細は [docs/ocr_source_case_workflow.md](docs/ocr_source_case_workflow.md) を参照してください。
 
 ## 構成
 
@@ -194,6 +195,7 @@ dataset 側の主な責務分割:
 - [source_cases/schema.py](ocr_dataset/src/ocr_dataset/source_cases/schema.py): source case の標準ファイル配置
 - [source_cases/generate_roi_strips.py](ocr_dataset/src/ocr_dataset/source_cases/generate_roi_strips.py): source image から短冊状 ROI 定義を生成
 - [source_cases/vision_batch_ocr.py](ocr_dataset/src/ocr_dataset/source_cases/vision_batch_ocr.py): ROI 短冊画像から vision OCR 候補テキストを生成
+- [source_cases/sync_roi_candidates.py](ocr_dataset/src/ocr_dataset/source_cases/sync_roi_candidates.py): ROI OCR 候補を `roi_labels.json` に同期
 - [source_cases/source_case_gui.py](ocr_dataset/src/ocr_dataset/source_cases/source_case_gui.py): OCR Source Case Builder GUI
 - [exporters/paddleocr_dataset.py](ocr_dataset/src/ocr_dataset/exporters/paddleocr_dataset.py): PaddleOCR 学習形式 export の境界
 

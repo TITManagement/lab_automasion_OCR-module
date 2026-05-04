@@ -104,13 +104,13 @@ GUI で source case を作成する例:
 lab-ocr-source-case-gui
 ```
 
-GUI では、事前に確認済みの元画像と画像全体の正解文字列を入力し、case ID を指定して source case assets を作成します。実行すると、元画像のコピー、`expected.txt` 保存、`rois.json` 生成、`roi_labels.json` 初期生成、`variants/` 生成をまとめて行います。必要に応じて `Generate OCR candidate .txt files from ROI strips` を有効にすると、生成した ROI 短冊から `.txt` 候補も続けて作成します。作成後に `expected.txt`、`rois.json`、`roi_strips/`、`roi_labels.json` を確認し、ROI ごとのラベル整備へ進みます。
+GUI では、事前に確認済みの元画像と画像全体の正解文字列を入力し、case ID を指定して source case assets を作成します。実行すると、元画像のコピー、`expected.txt` 保存、`rois.json` 生成、`roi_labels.json` 初期生成、`variants/` 生成をまとめて行います。必要に応じて `ROI 短冊から OCR 候補 .txt を生成` を有効にすると、生成した ROI 短冊から `.txt` 候補も続けて作成し、`roi_labels.json` の `candidate_text` に同期します。作成後は `ROI確認` タブで短冊画像と `candidate_text` を見比べ、確定文字列を `text` に保存し、確認済みの `status` を `verified` にします。
 
 ## 学習準備プロセス
 
 [source_cases/img_0678/IMG_0678.jpg](source_cases/img_0678/IMG_0678.jpg) と [source_cases/img_0678/expected.txt](source_cases/img_0678/expected.txt) は、PaddleOCR の fine-tuning に向けた source case です。
 
-現時点でこのリポジトリに実装済みの範囲は、学習そのものではなく、学習に使う source case の整備と synthetic variants 生成までです。PaddleOCR 学習形式への export 境界は [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) にありますが、実処理は未実装です。
+現時点でこのリポジトリに実装済みの範囲は、学習そのものではなく、学習に使う source case の整備と学習用の水増し画像生成までです。PaddleOCR 学習形式への export 境界は [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) にありますが、実処理は未実装です。
 
 処理の流れ:
 
@@ -137,7 +137,7 @@ IMG_0678.jpg
 lab-ocr-source-case-gui
 ```
 
-GUI 内で `Generate OCR candidate .txt files from ROI strips` を有効にすると、source case 作成後に ROI 短冊 OCR 候補生成まで続けて実行できます。この機能には `ANTHROPIC_API_KEY` が必要です。
+GUI 内で `ROI 短冊から OCR 候補 .txt を生成` を有効にすると、source case 作成後に ROI 短冊 OCR 候補生成と `roi_labels.json` への候補同期まで続けて実行できます。Vision provider は `Anthropic` または `OpenAI` から選択できます。OpenAI provider では `gpt-5.4-mini`、`gpt-5.5`、`gpt-5.4`、`gpt-5.4-nano`、`gpt-4.1`、`gpt-4.1-mini` を選択できます。この機能には `ANTHROPIC_API_KEY` または `OPENAI_API_KEY` が必要です。
 
 ### 2. ROI 短冊を生成する
 
@@ -155,10 +155,17 @@ lab-ocr-generate-roi-strips source_cases/img_0678
 
 ```bash
 export ANTHROPIC_API_KEY="..."
-lab-ocr-vision-batch ocr_dataset/source_cases/img_0678/roi_strips
+lab-ocr-vision-batch source_cases/img_0678/roi_strips --provider Anthropic
+lab-ocr-vision-batch source_cases/img_0678/roi_strips --provider OpenAI --model gpt-5.4-mini
 ```
 
-この出力は候補です。画像と照合してから `roi_labels.json` に反映します。
+この出力は候補です。候補 `.txt` を `roi_labels.json` の `candidate_text` に同期するには次を実行します。
+
+```bash
+lab-ocr-sync-roi-candidates source_cases/img_0678
+```
+
+GUI から候補生成した場合、この同期は自動で行われます。`candidate_text` は正解ではないため、`ROI確認` タブで画像と照合してから `text` に反映します。
 
 ### 4. ROI ごとの正解ラベルを整備する
 
@@ -173,12 +180,14 @@ ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_c
   "roi_id": "strip_0001",
   "image": "roi_strips/strip_0001.jpg",
   "text": "ギャラリー",
-  "candidate_text": "",
+  "candidate_text": "ギャラリー",
+  "candidate_source": "vision_ocr",
+  "candidate_file": "roi_strips/strip_0001.txt",
   "status": "verified"
 }
 ```
 
-自動生成直後の `roi_labels.json` は `status: needs_labeling` とし、`text` は空にします。`image` が指す短冊画像を人が確認してから `text` を入力し、確認済みのものは `status: verified` に変更します。未確認のラベルを学習に使ってはいけません。
+自動生成直後の `roi_labels.json` は `status: needs_labeling` とし、`text` は空にします。`image` が指す短冊画像を人が確認してから `text` を入力し、確認済みのものは `status: verified` に変更します。この確認・保存は `lab-ocr-source-case-gui` の `ROI確認` タブで行えます。未確認のラベルを学習に使ってはいけません。
 
 画像を差し替えた場合は、次のコマンドで `rois.json` と `roi_labels.json` を同期します。
 
@@ -186,7 +195,7 @@ ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_c
 lab-ocr-prepare-source-case source_cases/img_0678
 ```
 
-### 5. Synthetic variants を生成する
+### 5. 学習用の水増し画像を生成する
 
 明るさ、ぼけ、回転などの揺らぎ画像は [../ocr_synthetic_data](../ocr_synthetic_data/) 側で生成します。
 
