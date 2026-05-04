@@ -44,8 +44,8 @@ class SourceCaseCreatorGui(ctk.CTk):
 
     def _build_ui(self) -> None:
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(4, weight=1)
-        self.grid_rowconfigure(6, weight=1)
+        self.grid_rowconfigure(3, weight=3)
+        self.grid_rowconfigure(6, weight=2)
 
         title = ctk.CTkLabel(self, text="Source Case Creator", font=ctk.CTkFont(size=22, weight="bold"))
         title.grid(row=0, column=0, padx=18, pady=(18, 8), sticky="w")
@@ -70,8 +70,14 @@ class SourceCaseCreatorGui(ctk.CTk):
             row=2, column=1, padx=8, pady=(0, 12), sticky="w"
         )
 
-        ctk.CTkLabel(self, text="Expected Text").grid(row=2, column=0, padx=18, pady=(12, 4), sticky="w")
-        self.expected_text = ctk.CTkTextbox(self, wrap="word", height=260)
+        expected_header = ctk.CTkFrame(self, fg_color="transparent")
+        expected_header.grid(row=2, column=0, padx=18, pady=(12, 4), sticky="ew")
+        expected_header.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(expected_header, text="Expected Text").grid(row=0, column=0, sticky="w")
+        ctk.CTkButton(expected_header, text="Load Text", command=self._load_expected_text, width=120).grid(
+            row=0, column=1, sticky="e"
+        )
+        self.expected_text = ctk.CTkTextbox(self, wrap="word", height=220)
         self.expected_text.grid(row=3, column=0, padx=18, pady=4, sticky="nsew")
 
         controls = ctk.CTkFrame(self)
@@ -83,7 +89,7 @@ class SourceCaseCreatorGui(ctk.CTk):
         self.status_label.grid(row=0, column=1, padx=12, pady=12, sticky="w")
 
         ctk.CTkLabel(self, text="Result").grid(row=5, column=0, padx=18, pady=(12, 4), sticky="w")
-        self.result_text = ctk.CTkTextbox(self, wrap="none", height=180)
+        self.result_text = ctk.CTkTextbox(self, wrap="none", height=160)
         self.result_text.grid(row=6, column=0, padx=18, pady=(4, 18), sticky="nsew")
 
     def _select_image(self) -> None:
@@ -99,6 +105,30 @@ class SourceCaseCreatorGui(ctk.CTk):
             self.image_path.set(path)
             if not self.case_id.get().strip():
                 self.case_id.set(Path(path).stem.lower())
+
+    def _load_expected_text(self) -> None:
+        path = filedialog.askopenfilename(
+            title="Select expected text",
+            initialdir=str(dataset_root()),
+            filetypes=[
+                ("Text files", "*.txt *.md"),
+                ("All files", "*.*"),
+            ],
+        )
+        if not path:
+            return
+
+        try:
+            text = Path(path).read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            messagebox.showerror("Load failed", "Expected text must be UTF-8 encoded.")
+            return
+        except OSError as exc:
+            messagebox.showerror("Load failed", str(exc))
+            return
+
+        self.expected_text.delete("1.0", "end")
+        self.expected_text.insert("1.0", text)
 
     def _run_prepare(self) -> None:
         if self._worker and self._worker.is_alive():
