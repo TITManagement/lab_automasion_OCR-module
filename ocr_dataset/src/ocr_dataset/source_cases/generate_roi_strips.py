@@ -36,6 +36,7 @@ class RoiStrip:
     rel_y: float
     rel_width: float
     rel_height: float
+    image: str
 
 
 def _source_image_path(case: EvaluationCase, image_name: str | None) -> Path:
@@ -133,6 +134,10 @@ def generate_roi_strips(
     pad_y = max(4, int(height * pad_ratio))
     pad_x = max(8, int(width * pad_ratio))
 
+    case.roi_strips_dir.mkdir(parents=True, exist_ok=True)
+    for stale_strip in case.roi_strips_dir.glob("strip_*.jpg"):
+        stale_strip.unlink()
+
     strips: list[RoiStrip] = []
     for start, end in _find_vertical_bands(morph, min_height=min_height, gap=gap):
         strip_height = end - start
@@ -148,9 +153,15 @@ def generate_roi_strips(
         roi_height = y1 - y0
         if roi_width < width * 0.08 or roi_height < min_height:
             continue
+        strip_id = f"strip_{len(strips) + 1:04d}"
+        strip_image_name = f"{strip_id}.jpg"
+        strip_image_rel = f"{case.roi_strips_dir.name}/{strip_image_name}"
+        strip_image_path = case.roi_strips_dir / strip_image_name
+        cv2.imwrite(str(strip_image_path), image[y0:y1, x0:x1])
+
         strips.append(
             RoiStrip(
-                id=f"strip_{len(strips) + 1:04d}",
+                id=strip_id,
                 kind="auto_strip",
                 x=int(x0),
                 y=int(y0),
@@ -160,6 +171,7 @@ def generate_roi_strips(
                 rel_y=round(y0 / height, 6),
                 rel_width=round(roi_width / width, 6),
                 rel_height=round(roi_height / height, 6),
+                image=strip_image_rel,
             )
         )
 
@@ -168,6 +180,7 @@ def generate_roi_strips(
         "generated_by": "ocr_dataset.source_cases.generate_roi_strips",
         "source_image": source_image.name,
         "image_size": {"width": width, "height": height},
+        "roi_strips_dir": case.roi_strips_dir.name,
         "roi_count": len(strips),
         "rois": [asdict(strip) for strip in strips],
     }

@@ -6,6 +6,7 @@
     "width": 4284,
     "height": 5712
   },
+  "roi_strips_dir": "roi_strips",
   "roi_count": 23,
   "rois": [
     {
@@ -18,7 +19,8 @@
       "rel_x": 0.047852,
       "rel_y": 0.006828,
       "rel_width": 0.952148,
-      "rel_height": 0.026261
+      "rel_height": 0.026261,
+      "image": "roi_strips/strip_0001.jpg"
     },
     {
       "id": "strip_0002",
@@ -30,7 +32,8 @@
       "rel_x": 0.067694,
       "rel_y": 0.032038,
       "rel_width": 0.932306,
-      "rel_height": 0.029587
+      "rel_height": 0.029587,
+      "image": "roi_strips/strip_0002.jpg"
     },
     {
       "id": "strip_0003",
@@ -42,7 +45,8 @@
       "rel_x": 0.0,
       "rel_y": 0.060399,
       "rel_width": 1.0,
-      "rel_height": 0.057773
+      "rel_height": 0.057773,
+      "image": "roi_strips/strip_0003.jpg"
     },
     {
       "id": "strip_0004",
@@ -54,7 +58,8 @@
       "rel_x": 0.01704,
       "rel_y": 0.110994,
       "rel_width": 0.98296,
-      "rel_height": 0.023634
+      "rel_height": 0.023634,
+      "image": "roi_strips/strip_0004.jpg"
     },
     {
       "id": "strip_0005",
@@ -66,7 +71,8 @@
       "rel_x": 0.028711,
       "rel_y": 0.138305,
       "rel_width": 0.971289,
-      "rel_height": 0.026085
+      "rel_height": 0.026085,
+      "image": "roi_strips/strip_0005.jpg"
     },
     {
       "id": "strip_0006",
@@ -78,7 +84,8 @@
       "rel_x": 0.007703,
       "rel_y": 0.163866,
       "rel_width": 0.992297,
-      "rel_height": 0.058473
+      "rel_height": 0.058473,
+      "image": "roi_strips/strip_0006.jpg"
     },
     {
       "id": "strip_0007",
@@ -90,7 +97,8 @@
       "rel_x": 0.069795,
       "rel_y": 0.218312,
       "rel_width": 0.930205,
-      "rel_height": 0.019433
+      "rel_height": 0.019433,
+      "image": "roi_strips/strip_0007.jpg"
     },
     {
       "id": "strip_0008",
@@ -102,7 +110,8 @@
       "rel_x": 0.069795,
       "rel_y": 0.232843,
       "rel_width": 0.930205,
-      "rel_height": 0.022759
+      "rel_height": 0.022759,
+      "image": "roi_strips/strip_0008.jpg"
     },
     {
       "id": "strip_0009",
@@ -114,7 +123,8 @@
       "rel_x": 0.0,
       "rel_y": 0.24895,
       "rel_width": 1.0,
-      "rel_height": 0.02451
+      "rel_height": 0.02451,
+      "image": "roi_strips/strip_0009.jpg"
     },
     {
       "id": "strip_0010",
@@ -126,7 +136,8 @@
       "rel_x": 0.026844,
       "rel_y": 0.266982,
       "rel_width": 0.973156,
-      "rel_height": 0.078782
+      "rel_height": 0.078782,
+      "image": "roi_strips/strip_0010.jpg"
     },
     {
       "id": "strip_0011",
@@ -138,7 +149,8 @@
       "rel_x": 0.029879,
       "rel_y": 0.33841,
       "rel_width": 0.970121,
-      "rel_height": 0.041141
+      "rel_height": 0.041141,
+      "image": "roi_strips/strip_0011.jpg"
     },
     {
       "id": "strip_0012",
@@ -150,7 +162,8 @@
       "rel_x": 0.0,
       "rel_y": 0.372199,
       "rel_width": 1.0,
-      "rel_height": 0.041317
+      "rel_height": 0.041317,
+      "image": "roi_strips/strip_0012.jpg"
     },
     {
       "id": "strip_0013",
@@ -162,7 +175,8 @@
       "rel_x": 0.066993,
       "rel_y": 0.407213,
       "rel_width": 0.933007,
-      "rel_height": 0.023985
+      "rel_height": 0.023985,
+      "image": "roi_strips/strip_0013.jpg"
     },
     {
       "id": "strip_0014",
@@ -174,7 +188,8 @@
       "rel_x": 0.025677,
       "rel_y": 0.430672,
       "rel_width": 0.974323,
-      "rel_height": 0.029937
+      "rel_height": 0.029937,
+      "image": "roi_strips/strip_0014.jpg"
     },
     {
       "id": "strip_0015",
@@ -186,7 +201,8 @@
       "rel_x": 0.028711,
       "rel_y": 0.46271,
       "rel_width": 0.971289,
-      "rel_height": 0.029587
+      "rel_height": 0.029587,
+      "image": "roi_strips/strip_0015.jpg"
     },
     {
       "id": "strip_0016",
@@ -198,7 +214,8 @@
       "rel_x": 0.00957,
       "rel_y": 0.48687,
       "rel_width": 0.99043,
-      "rel_height": 0.02486
+      "rel_height": 0.02486,
+      "image": "roi_strips/strip_0016.jpg"
     },
     {
       "id": "strip_0017",
@@ -210,7 +227,8 @@
       "rel_x": 0.0,
       "rel_y": 0.504377,
       "rel_width": 1.0,
-      "rel_height": 0.057248
+      "rel_height": 0.057248,
+      "image": "roi_strips/strip_0017.jpg"
     },
     {
       "id": "strip_0018",
@@ -222,7 +240,8 @@
       "rel_x": 0.0,
       "rel_y": 0.558473,
       "rel_width": 1.0,
-      "rel_height": 0.058123
+      "rel_height": 0.058123,
+      "image": "roi_strips/strip_0018.jpg"
     },
     {
       "id": "strip_0019",
@@ -234,7 +253,8 @@
       "rel_x": 0.0,
       "rel_y": 0.609419,
       "rel_width": 1.0,
-      "rel_height": 0.08841
+      "rel_height": 0.08841,
+      "image": "roi_strips/strip_0019.jpg"
     },
     {
       "id": "strip_0020",
@@ -246,7 +266,8 @@
       "rel_x": 0.0,
       "rel_y": 0.69888,
       "rel_width": 1.0,
-      "rel_height": 0.035189
+      "rel_height": 0.035189,
+      "image": "roi_strips/strip_0020.jpg"
     },
     {
       "id": "strip_0021",
@@ -258,7 +279,8 @@
       "rel_x": 0.0,
       "rel_y": 0.73652,
       "rel_width": 1.0,
-      "rel_height": 0.034314
+      "rel_height": 0.034314,
+      "image": "roi_strips/strip_0021.jpg"
     },
     {
       "id": "strip_0022",
@@ -270,7 +292,8 @@
       "rel_x": 0.0,
       "rel_y": 0.76313,
       "rel_width": 1.0,
-      "rel_height": 0.105567
+      "rel_height": 0.105567,
+      "image": "roi_strips/strip_0022.jpg"
     },
     {
       "id": "strip_0023",
@@ -282,7 +305,8 @@
       "rel_x": 0.066527,
       "rel_y": 0.921394,
       "rel_width": 0.894258,
-      "rel_height": 0.030112
+      "rel_height": 0.030112,
+      "image": "roi_strips/strip_0023.jpg"
     }
   ]
 }

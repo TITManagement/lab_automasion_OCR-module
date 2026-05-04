@@ -85,6 +85,7 @@ def create_source_case(
         "expected_text": str(expected_path),
         "expected_fields": str(fields_path),
         "rois": str(case_dir / "rois.json"),
+        "roi_strips_dir": str(case_dir / "roi_strips"),
         "roi_labels": str(case_dir / "roi_labels.json"),
         "roi_count": prepare_summary["roi_count"],
         "variant_count": len(variant_paths),

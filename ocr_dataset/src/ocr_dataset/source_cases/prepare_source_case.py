@@ -50,6 +50,7 @@ def _build_roi_labels(
         roi_id = roi["id"]
         previous_label = previous_labels_by_id.get(roi_id, {})
         text = str(previous_label.get("text", ""))
+        candidate_text = str(previous_label.get("candidate_text", ""))
         previous_status = str(previous_label.get("status", "needs_labeling"))
         previous_roi = previous_rois_by_id.get(roi_id)
 
@@ -63,9 +64,11 @@ def _build_roi_labels(
         labels.append(
             {
                 "roi_id": roi_id,
+                "image": str(roi.get("image", "")),
                 "text": text,
+                "candidate_text": candidate_text,
                 "status": status,
-                "note": "Fill with the exact text visible in this ROI.",
+                "note": "Review the ROI strip image and fill text.",
             }
         )
 
@@ -78,6 +81,7 @@ def _build_roi_labels(
         "schema_version": 1,
         "source_image": rois_payload["source_image"],
         "source_rois": case.rois.name,
+        "source_roi_strips": rois_payload.get("roi_strips_dir", case.roi_strips_dir.name),
         "label_status": label_status,
         "labels": labels,
     }
@@ -110,6 +114,7 @@ def prepare_source_case(
         "source_image": source_image.name,
         "expected_created": expected_created,
         "roi_count": rois_payload["roi_count"],
+        "roi_strips_dir": str(case.roi_strips_dir),
         "roi_labels": str(case.roi_labels),
         "label_status": labels_payload["label_status"],
     }

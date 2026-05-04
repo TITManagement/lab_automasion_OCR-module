@@ -138,13 +138,13 @@ lab-ocr-source-case-gui
 
 ### 2. ROI 短冊を生成する
 
-ROI 定義は [source_cases/img_0678/rois.json](source_cases/img_0678/rois.json) に保存します。
+ROI 定義は [source_cases/img_0678/rois.json](source_cases/img_0678/rois.json) に保存します。人が分割単位を確認できるよう、同時に `source_cases/img_0678/roi_strips/strip_XXXX.jpg` も生成します。
 
 ```bash
 lab-ocr-generate-roi-strips source_cases/img_0678
 ```
 
-`rois.json` には `source_image`、画像サイズ、短冊ごとの座標を保存します。`IMG_0678.jpg` から生成した場合、`source_image` は `IMG_0678.jpg` になります。
+`rois.json` には `source_image`、画像サイズ、短冊ごとの座標、短冊画像への相対パスを保存します。`IMG_0678.jpg` から生成した場合、`source_image` は `IMG_0678.jpg` になります。
 
 ### 3. ROI ごとの正解ラベルを整備する
 
@@ -157,12 +157,14 @@ ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_c
 ```json
 {
   "roi_id": "strip_0001",
+  "image": "roi_strips/strip_0001.jpg",
   "text": "ギャラリー",
+  "candidate_text": "",
   "status": "verified"
 }
 ```
 
-自動生成直後の `roi_labels.json` は `status: needs_labeling` とし、`text` は空にします。画像と ROI を人が確認してから `text` を入力し、確認済みのものは `status: verified` に変更します。未確認のラベルを学習に使ってはいけません。
+自動生成直後の `roi_labels.json` は `status: needs_labeling` とし、`text` は空にします。`image` が指す短冊画像を人が確認してから `text` を入力し、確認済みのものは `status: verified` に変更します。未確認のラベルを学習に使ってはいけません。
 
 画像を差し替えた場合は、次のコマンドで `rois.json` と `roi_labels.json` を同期します。
 

@@ -59,6 +59,11 @@ class EvaluationCase:
         return self.case_dir / "roi_labels.json"
 
     @property
+    def roi_strips_dir(self) -> Path:
+        """ROI 確認用に切り出した短冊画像の保存先ディレクトリを返す。"""
+        return self.case_dir / "roi_strips"
+
+    @property
     def variants_dir(self) -> Path:
         """生成した synthetic variants の保存先ディレクトリを返す。"""
         return self.case_dir / "variants"
