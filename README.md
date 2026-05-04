@@ -145,6 +145,8 @@ lab-ocr-source-case-gui
 
 この GUI は、OCR 学習用元画像と画像全体の全文正解テキストから、1つの source case を作成します。作成対象は、元画像コピー、`expected.txt`、`rois.json`、`roi_strips/`、`roi_labels.json`、必要に応じた `variants/` と ROI OCR 候補 `.txt` です。作成後は同じGUI内の `ROI確認` タブで短冊画像、`candidate_text`、確定用 `text`、`status` を確認・保存できます。
 
+`ROI確認` タブで既存 case を開く場合は、`ocr_dataset/source_cases/img_0678` のような `roi_labels.json` と `roi_strips/` を含む case フォルダを選びます。`text` が空で `candidate_text` があるROIは、編集欄に候補を仮入力しますが、`status` は自動で `verified` にはしません。画像と照合してから `verified` にしてください。`verified` で `text` が空の場合は保存を止めます。
+
 `ROI 短冊から OCR 候補 .txt を生成` を有効にした場合だけ、Vision provider / model による候補生成を実行します。Provider は `Anthropic` または `OpenAI` から選択できます。OpenAI を選ぶと `gpt-5.4-mini`、`gpt-5.5`、`gpt-5.4`、`gpt-5.4-nano`、`gpt-4.1`、`gpt-4.1-mini` を選択できます。環境変数 `ANTHROPIC_API_KEY` または `OPENAI_API_KEY` が設定済みならそれを使い、未設定なら実行時モーダルで入力します。入力された API key は保存しません。
 
 ROI OCR 候補生成の結果は、`roi_strips/vision_ocr_summary.json` と `roi_strips/vision_ocr.log` に保存します。候補 `.txt` は `roi_labels.json` の `candidate_text` にも同期します。これらは PaddleOCR へ直接渡す学習入力ではなく、候補生成の再現性、監査、再実行判断、品質確認に使う情報です。

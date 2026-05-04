@@ -106,6 +106,8 @@ lab-ocr-source-case-gui
 
 GUI では、事前に確認済みの元画像と画像全体の正解文字列を入力し、case ID を指定して source case assets を作成します。実行すると、元画像のコピー、`expected.txt` 保存、`rois.json` 生成、`roi_labels.json` 初期生成、`variants/` 生成をまとめて行います。必要に応じて `ROI 短冊から OCR 候補 .txt を生成` を有効にすると、生成した ROI 短冊から `.txt` 候補も続けて作成し、`roi_labels.json` の `candidate_text` に同期します。作成後は `ROI確認` タブで短冊画像と `candidate_text` を見比べ、確定文字列を `text` に保存し、確認済みの `status` を `verified` にします。
 
+`ROI確認` タブで手動読込する場合は、`source_cases/img_0678` のような case フォルダを選択します。選択するフォルダには `roi_labels.json` と `roi_strips/` が必要です。`text` が空で `candidate_text` がある場合、GUI は作業効率のため `candidate_text` を `text` 欄へ仮入力します。ただし候補は正解ではないため、画像と照合するまで `verified` にしないでください。`verified` のまま `text` が空の保存は拒否します。
+
 ## 学習準備プロセス
 
 [source_cases/img_0678/IMG_0678.jpg](source_cases/img_0678/IMG_0678.jpg) と [source_cases/img_0678/expected.txt](source_cases/img_0678/expected.txt) は、PaddleOCR の fine-tuning に向けた source case です。
@@ -188,6 +190,15 @@ ROI ごとの正解ラベルは [source_cases/img_0678/roi_labels.json](source_c
 ```
 
 自動生成直後の `roi_labels.json` は `status: needs_labeling` とし、`text` は空にします。`image` が指す短冊画像を人が確認してから `text` を入力し、確認済みのものは `status: verified` に変更します。この確認・保存は `lab-ocr-source-case-gui` の `ROI確認` タブで行えます。未確認のラベルを学習に使ってはいけません。
+
+`status` の意味:
+
+- `needs_labeling`: 未確認。まだ学習に使わない。
+- `needs_review`: 判断保留。分割や読順などを再確認する。
+- `verified`: 画像と照合済み。PaddleOCR export の対象にできる。
+- `skipped`: 学習に使わない。
+
+`text` に書くのは、元ページの見た目レイアウトではなく、そのROI画像をOCRしたときに返ってほしい正解文字列です。画像内で読める順序を保ち、自然な行区切りの改行は残します。位置合わせ用の空白や余分な空行は入れすぎません。2段組みなら、左段を上から下、次に右段を上から下の順に書きます。段組みや別文脈が混ざる場合は、文字列で吸収するよりROI分割の見直しを優先します。
 
 画像を差し替えた場合は、次のコマンドで `rois.json` と `roi_labels.json` を同期します。
 

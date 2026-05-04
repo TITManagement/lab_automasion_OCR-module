@@ -1,13 +1,13 @@
 ---
 title: "lab_automasion_OCR-module Documentation Book"
-date: "2026-05-04 23:12:58"
+date: "2026-05-04 23:54:09"
 toc: true
 numbersections: true
 ---
 
 # Book Build Metadata
 
-Generated at: 2026-05-04 23:12:58\n
+Generated at: 2026-05-04 23:54:09\n
 
 
 ---
@@ -162,6 +162,8 @@ lab-ocr-source-case-gui
 ```
 
 この GUI は、OCR 学習用元画像と画像全体の全文正解テキストから、1つの source case を作成します。作成対象は、元画像コピー、`expected.txt`、`rois.json`、`roi_strips/`、`roi_labels.json`、必要に応じた `variants/` と ROI OCR 候補 `.txt` です。作成後は同じGUI内の `ROI確認` タブで短冊画像、`candidate_text`、確定用 `text`、`status` を確認・保存できます。
+
+`ROI確認` タブで既存 case を開く場合は、`ocr_dataset/source_cases/img_0678` のような `roi_labels.json` と `roi_strips/` を含む case フォルダを選びます。`text` が空で `candidate_text` があるROIは、編集欄に候補を仮入力しますが、`status` は自動で `verified` にはしません。画像と照合してから `verified` にしてください。`verified` で `text` が空の場合は保存を止めます。
 
 `ROI 短冊から OCR 候補 .txt を生成` を有効にした場合だけ、Vision provider / model による候補生成を実行します。Provider は `Anthropic` または `OpenAI` から選択できます。OpenAI を選ぶと `gpt-5.4-mini`、`gpt-5.5`、`gpt-5.4`、`gpt-5.4-nano`、`gpt-4.1`、`gpt-4.1-mini` を選択できます。環境変数 `ANTHROPIC_API_KEY` または `OPENAI_API_KEY` が設定済みならそれを使い、未設定なら実行時モーダルで入力します。入力された API key は保存しません。
 
@@ -733,7 +735,7 @@ http:I/www... -> http://www...       [url_scheme]
 | 作成者 | `Codex` |
 | 最終更新日 | `2026-05-04` |
 | 最終更新者 | `Codex` |
-| 版数 | `v1.2` |
+| 版数 | `v1.3` |
 | 状態 | `運用中` |
 
 ## 1. 概要
@@ -798,6 +800,8 @@ GUI 内で使用者の判断が必要な項目は以下である。
 - ROI ごとの `text` 入力
 - ROI ごとの `status` 確定
 
+既存 case を `ROI確認` タブで開く場合は、`ocr_dataset/source_cases/img_0678` のような `roi_labels.json` と `roi_strips/` を含む case フォルダを選択する。
+
 `Vision provider` で `OpenAI` を選択した場合は、OpenAI の画像入力対応モデルをドロップダウンから選ぶ。初期値は ROI 短冊の一括処理で使いやすい `gpt-5.4-mini` とする。
 
 API key は、以下の条件を満たす場合だけ実行時モーダルで入力する。
@@ -844,6 +848,17 @@ ROI 短冊画像
 ```
 
 未確認の `candidate_text` をそのまま PaddleOCR 学習に使ってはいけない。
+
+GUI では作業効率のため、`text` が空で `candidate_text` がある場合に `candidate_text` を `text` 欄へ仮入力する。ただしこれは verified ではない。人が短冊画像と照合し、必要な修正を行ってから `status` を `verified` にする。`status: verified` で `text` が空の場合、GUI は保存を拒否する。
+
+`status` の意味:
+
+- `needs_labeling`: 未確認。まだ学習に使わない。
+- `needs_review`: 判断保留。分割や読順などを再確認する。
+- `verified`: 画像と照合済み。PaddleOCR export の対象にできる。
+- `skipped`: 学習に使わない。
+
+`text` に書くのは、元ページの見た目レイアウトではなく、そのROI画像をOCRしたときに返ってほしい正解文字列である。画像内で読める順序を保ち、自然な行区切りの改行は残す。位置合わせ用の空白や余分な空行は入れすぎない。2段組みなら、左段を上から下、次に右段を上から下の順に書く。段組みや別文脈が混ざる場合は、文字列で吸収するよりROI分割の見直しを優先する。
 
 ## 7. PaddleOCR へ渡す最終形式
 
@@ -928,6 +943,8 @@ GUI は `作成` と `ROI確認` のタブで構成する。
 - 前へ / 次へ
 - 保存 / 保存して次へ
 - 進捗と verified 件数
+- status 説明
+- ラベル入力の考え方
 
 ## 11. 今後の実装候補
 
