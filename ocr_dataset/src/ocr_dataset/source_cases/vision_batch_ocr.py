@@ -23,7 +23,7 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any
 
-from ocr_dataset.paths import resolve_dataset_path
+from ocr_dataset.paths import dataset_root, resolve_dataset_path
 
 
 DEFAULT_MODEL = "claude-sonnet-4-6"
@@ -94,6 +94,21 @@ def _package_version(package_name: str) -> str | None:
         return None
 
 
+def _portable_dataset_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(dataset_root().resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _portable_summary(summary: dict[str, Any]) -> dict[str, Any]:
+    portable = dict(summary)
+    for key in ["source_dir", "summary_path", "log_path"]:
+        if key in portable:
+            portable[key] = _portable_dataset_path(Path(str(portable[key])))
+    return portable
+
+
 def _write_log(log_path: Path | None, message: str) -> None:
     if log_path is None:
         return
@@ -109,7 +124,7 @@ def _print_and_log(log_path: Path | None, message: str) -> None:
 def _run_metadata(source_path: Path, model: str, start_strip: int, end_strip: int, dry_run: bool) -> dict[str, Any]:
     return {
         "schema_version": 1,
-        "source_dir": str(source_path),
+        "source_dir": _portable_dataset_path(source_path),
         "model": model,
         "prompt_version": PROMPT_VERSION,
         "prompt_sha256": hashlib.sha256(TRANSCRIPTION_PROMPT.encode("utf-8")).hexdigest(),
@@ -259,7 +274,10 @@ def process_roi_strips(
         summary_path = source_path / SUMMARY_FILE_NAME
         summary["summary_path"] = str(summary_path)
         summary["log_path"] = str(log_path)
-        summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        summary_path.write_text(
+            json.dumps(_portable_summary(summary), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     _print_and_log(log_path, f"Summary: {processed} processed, {skipped} skipped, {errors} errors")
     if dry_run:
