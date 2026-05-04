@@ -11,9 +11,9 @@
   "dry_run": false,
   "python": "3.11.8",
   "anthropic_package": "0.97.0",
-  "started_at": "2026-05-04T08:12:23Z",
-  "finished_at": "2026-05-04T08:13:57Z",
-  "elapsed_ms": 93362,
+  "started_at": "2026-05-04T13:25:59Z",
+  "finished_at": "2026-05-04T13:27:39Z",
+  "elapsed_ms": 100058,
   "processed": 23,
   "skipped": 0,
   "errors": 0,
@@ -30,7 +30,7 @@
         "width": 4079,
         "height": 150
       },
-      "elapsed_ms": 2360,
+      "elapsed_ms": 2429,
       "text_chars": 19,
       "text_sha256": "0ea28efef32857b4c3a3cdc6211016edfd7267190f9d622082f2e3d043f7804d"
     },
@@ -46,7 +46,7 @@
         "width": 3994,
         "height": 169
       },
-      "elapsed_ms": 2025,
+      "elapsed_ms": 2221,
       "text_chars": 23,
       "text_sha256": "8b776429f4bc1bb7cce56eef5e7e92ee109f7f9273bb08a6ff4584b338bd1311"
     },
@@ -62,7 +62,7 @@
         "width": 4284,
         "height": 330
       },
-      "elapsed_ms": 5818,
+      "elapsed_ms": 5908,
       "text_chars": 136,
       "text_sha256": "0119ef9df11fa6096a7ef55d512efeb7f0a1f80ccb39516df625f7c99841b8dd"
     },
@@ -78,7 +78,7 @@
         "width": 4211,
         "height": 135
       },
-      "elapsed_ms": 2360,
+      "elapsed_ms": 2482,
       "text_chars": 23,
       "text_sha256": "34e5498345e3fde0343b370468db84aa577a7c993291826d5ef9e0d7c8b511d3"
     },
@@ -94,9 +94,9 @@
         "width": 4161,
         "height": 149
       },
-      "elapsed_ms": 2445,
-      "text_chars": 32,
-      "text_sha256": "97f6a25a2e30ca68cfa3dd58e5a6a48031a730a9e8221abde5cd32cfb0e9230f"
+      "elapsed_ms": 2435,
+      "text_chars": 33,
+      "text_sha256": "5c64f8428ab3e024f8e067b50d502a23f6c7e41d345a06a3258aacd0afb52a5c"
     },
     {
       "strip": 6,
@@ -110,9 +110,9 @@
         "width": 4251,
         "height": 334
       },
-      "elapsed_ms": 7371,
-      "text_chars": 180,
-      "text_sha256": "835cbdc0dc474f566fa1823d8d9f0001511b018d9b3bb444016cba7558193cab"
+      "elapsed_ms": 7014,
+      "text_chars": 181,
+      "text_sha256": "376da397aba2583f974232fe5963e85a61a1331439329e72a5547e230770c0e4"
     },
     {
       "strip": 7,
@@ -126,7 +126,7 @@
         "width": 3985,
         "height": 111
       },
-      "elapsed_ms": 2154,
+      "elapsed_ms": 3141,
       "text_chars": 15,
       "text_sha256": "79cce68a95992cf2e92bc4d3fd93baee28fedd00fb3d4396b3ec8adc2f6bcc60"
     },
@@ -142,9 +142,9 @@
         "width": 3985,
         "height": 130
       },
-      "elapsed_ms": 2241,
-      "text_chars": 33,
-      "text_sha256": "026bd190ca6208d21dea43c6866ad41ec1d9345744aadf1ce1768f20e86cae58"
+      "elapsed_ms": 3988,
+      "text_chars": 53,
+      "text_sha256": "bc8979f351b28a3bcda8b39e1b8c80ef6c6ede22558d49bdd849d30fc6762740"
     },
     {
       "strip": 9,
@@ -158,9 +158,9 @@
         "width": 4284,
         "height": 140
       },
-      "elapsed_ms": 4120,
+      "elapsed_ms": 3902,
       "text_chars": 41,
-      "text_sha256": "e0e5b5f1a1fb8fe350bd66d810151d6d95f766049967b8253bc007dcafef41ee"
+      "text_sha256": "00a59ceeaf1648b043c520dc2c76af9c788f426c6168e7de9f4f833b931ed5e2"
     },
     {
       "strip": 10,
@@ -174,9 +174,9 @@
         "width": 4169,
         "height": 450
       },
-      "elapsed_ms": 9231,
-      "text_chars": 190,
-      "text_sha256": "179fdc40ee53b24dc06f473a525a812e793d046d6273f3ee5241404189866881"
+      "elapsed_ms": 7469,
+      "text_chars": 197,
+      "text_sha256": "4717e130475e5023f304030aba7a945655c6f1830f6629555ed09270081e3685"
     },
     {
       "strip": 11,
@@ -190,9 +190,9 @@
         "width": 4156,
         "height": 235
       },
-      "elapsed_ms": 4474,
-      "text_chars": 104,
-      "text_sha256": "912f3a05055740a4d728fd51ee7c2275415e93b17b55dec2359ec6f1bbf51063"
+      "elapsed_ms": 4904,
+      "text_chars": 97,
+      "text_sha256": "7538352f636bc9e9c607904f8ebcaff91edf085901ce94d036d222e2e32f37c4"
     },
     {
       "strip": 12,
@@ -206,9 +206,9 @@
         "width": 4284,
         "height": 236
       },
-      "elapsed_ms": 4615,
-      "text_chars": 94,
-      "text_sha256": "a6730a90cfdd74242d8af427a4acf8212b57e9dfeb8129ac99a16f88d5325c3f"
+      "elapsed_ms": 4098,
+      "text_chars": 85,
+      "text_sha256": "7a52c29080911b874f16c023edcabc5ec546e3ca501d2c41e9359908885b518d"
     },
     {
       "strip": 13,
@@ -222,7 +222,7 @@
         "width": 3997,
         "height": 137
       },
-      "elapsed_ms": 2039,
+      "elapsed_ms": 2246,
       "text_chars": 26,
       "text_sha256": "38eabd0a7017f57355ccfa94408f7f0420f0b65ce5dcd86b144bf4ad2de81fbe"
     },
@@ -238,9 +238,9 @@
         "width": 4174,
         "height": 171
       },
-      "elapsed_ms": 5165,
-      "text_chars": 51,
-      "text_sha256": "b104ca1f1a93d728cf8bc3532fa16b68667d78b667a603dc82fdaeb1158d4c78"
+      "elapsed_ms": 10495,
+      "text_chars": 6,
+      "text_sha256": "f5d1f955a47fd9b0a096b082cace1d72fcf70d8fda1f8e1b7cf2bc5eef210f3f"
     },
     {
       "strip": 15,
@@ -254,9 +254,9 @@
         "width": 4161,
         "height": 169
       },
-      "elapsed_ms": 3006,
-      "text_chars": 73,
-      "text_sha256": "eafa8d2129938e709051531c5a56491aa05918fb8c26a45c0cdc1829df8d4990"
+      "elapsed_ms": 3241,
+      "text_chars": 56,
+      "text_sha256": "0167c0b2c44222967df7ded66aa256b428f457bd670c30edfbd44a0c001d6051"
     },
     {
       "strip": 16,
@@ -270,9 +270,9 @@
         "width": 4243,
         "height": 142
       },
-      "elapsed_ms": 5227,
-      "text_chars": 137,
-      "text_sha256": "d8832c0ae162106ee867fa82a6ec0038ed642c4ed316cd98be4dbad7dbe0d26a"
+      "elapsed_ms": 4502,
+      "text_chars": 126,
+      "text_sha256": "f8d53a09c272bc9cac3708d74521aa380b7a026463b4413a7feb6bb3d14cc1e7"
     },
     {
       "strip": 17,
@@ -286,9 +286,9 @@
         "width": 4284,
         "height": 327
       },
-      "elapsed_ms": 4550,
-      "text_chars": 114,
-      "text_sha256": "9015ab5d3eaafe6b64a7ff2473a06395cd3984c59c63a41d1addf06b004b5bb5"
+      "elapsed_ms": 4894,
+      "text_chars": 116,
+      "text_sha256": "5f8e77a124e4ec944c1faa83cc0efd8936bb1863d9f19c087e4fd5bb5eea5d18"
     },
     {
       "strip": 18,
@@ -302,9 +302,9 @@
         "width": 4284,
         "height": 332
       },
-      "elapsed_ms": 4462,
+      "elapsed_ms": 4114,
       "text_chars": 127,
-      "text_sha256": "9efa743f172253cbfedac4a9817e2468219e706823893c61d1f8281a99915103"
+      "text_sha256": "e8c436c19e16b971549c0e1eec713d634553dbc7e19d9f72e13a901f60b8c82f"
     },
     {
       "strip": 19,
@@ -318,9 +318,9 @@
         "width": 4284,
         "height": 505
       },
-      "elapsed_ms": 5779,
+      "elapsed_ms": 6024,
       "text_chars": 204,
-      "text_sha256": "0ba573a139463b1680fcef305911dd0a87a1f1678c241481f0b40feff1d8aaf5"
+      "text_sha256": "4e1a4a99b8788fd1a4008010a1d1aae3c7da5858a2ab8385544b6e2af9bd0be8"
     },
     {
       "strip": 20,
@@ -334,9 +334,9 @@
         "width": 4284,
         "height": 201
       },
-      "elapsed_ms": 2465,
-      "text_chars": 44,
-      "text_sha256": "2ea4950455c9af3836196b336c0f3eef4a0f5749034a03f0a7954508cdf5cba2"
+      "elapsed_ms": 2551,
+      "text_chars": 46,
+      "text_sha256": "9196a63aaa492ee3f6bfafa6f03f36e5ba1e6c508e49ba90fd6b88601e911abc"
     },
     {
       "strip": 21,
@@ -350,9 +350,9 @@
         "width": 4284,
         "height": 196
       },
-      "elapsed_ms": 2949,
+      "elapsed_ms": 3072,
       "text_chars": 64,
-      "text_sha256": "6a15e95375d86fe170207df868a7ce248c6620290d57f0eb2d64466827da916f"
+      "text_sha256": "3e86107a9a0c0171293e27948c45a665de24aed6becd0294857d83a92ac3ad19"
     },
     {
       "strip": 22,
@@ -366,7 +366,7 @@
         "width": 4284,
         "height": 603
       },
-      "elapsed_ms": 6337,
+      "elapsed_ms": 6569,
       "text_chars": 211,
       "text_sha256": "26a572a3de103394f521fdd418b72ead7961909fa63191b8ffacfe91b6d74c09"
     },
@@ -382,7 +382,7 @@
         "width": 3831,
         "height": 172
       },
-      "elapsed_ms": 2111,
+      "elapsed_ms": 2286,
       "text_chars": 34,
       "text_sha256": "7a30b6c9b70a8fe9c6be6228db563f8f89f7b2e43040faa931c887a08948787b"
     }

@@ -9,7 +9,7 @@
       "roi_id": "strip_0001",
       "image": "roi_strips/strip_0001.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "ギャラリー　　　　　　　　◎文化財保護",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -17,7 +17,7 @@
       "roi_id": "strip_0002",
       "image": "roi_strips/strip_0002.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "問合せ 文化芸術課　　　埋蔵文化財取り扱い業務",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -25,7 +25,7 @@
       "roi_id": "strip_0003",
       "image": "roi_strips/strip_0003.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "市内には、芸術文化作品の発表や鑑賞の場を提供し、\n創造的な芸術文化活動の向上を目的としたギャラリー\nがあります。\n\n　　市内には、現在約90カ所の遺跡があることが確認さ\nれています。教育委員会では、埋蔵文化財の保存を目的\nに、開発行為や建築確認申請前に、埋蔵文化財の所在の",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -33,7 +33,7 @@
       "roi_id": "strip_0004",
       "image": "roi_strips/strip_0004.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "有無を窓口で確認しています。\n\n市民ギャラリー",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -41,7 +41,7 @@
       "roi_id": "strip_0005",
       "image": "roi_strips/strip_0005.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "・取手駅市民ギャラリー　　　　　　　　　　　郷土資料集・市史の頒布",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -49,7 +49,7 @@
       "roi_id": "strip_0006",
       "image": "roi_strips/strip_0006.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "取手駅東西連絡地下通路内に、市民の皆さんが制作\nした作品の発表の場として、展示スペース（東スペー\nス：幅17.9m・高さ1.8mと西スペース：幅10.8m・高さ\n1.8m）などを設置しました。\n\n　取手市が歩んだ歴史を郷土資料集や取手市史・藤代\n町史にまとめ頒布しています。頒布している本の内容\nや頒布方法などについては、お問い合わせください。\n\n月曜日\n予約晶",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -57,7 +57,7 @@
       "roi_id": "strip_0007",
       "image": "roi_strips/strip_0007.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "1.8m) 2カ所があります。",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -65,7 +65,7 @@
       "roi_id": "strip_0008",
       "image": "roi_strips/strip_0008.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "・藤代駅市民ギャラリー\n・藤代駅周辺においては、平日のみの利施\n\n至水戸\n\n至藤代\n\n団体利用\n予登録が必",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -73,7 +73,7 @@
       "roi_id": "strip_0009",
       "image": "roi_strips/strip_0009.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "藤代駅橋上連絡道内に展示スペース（北スペース：幅\n\n至藤代\n\n部登駅は\nりからとな",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -81,7 +81,7 @@
       "roi_id": "strip_0010",
       "image": "roi_strips/strip_0010.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "5.9m·高さ2.3mと南スペース：幅6.7m·高さ2.3m) 2\nカ所があります。\n\n▶利用するときは\n　個人でも団体でも利用申し込みができます。申し込\nみは調べた上で（13月から3回までる回数は一、下棚に\n\n国\n道\n六\n号\n\n取\n手\n駅\n\n本願寺 乚\n\n青柳南バス停\n\n取手東小入口バス停\n\n取手第一中学校\n\n取手東小学校\n\n日からこ\n正予約　9:0\n昼予約　10:\nンターネット\n\nン予約",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -89,7 +89,7 @@
       "roi_id": "strip_0011",
       "image": "roi_strips/strip_0011.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "み抽選会を4月（10月から翌年3月分）と10月（翌年4\n月から9月分）に行います。抽選後の空き期間について\nは、随時受け付けます。利用期間\n\n至小文間\n\n吉田バス停\n\n個人利用\n両市在住・在勤の",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -97,7 +97,7 @@
       "roi_id": "strip_0012",
       "image": "roi_strips/strip_0012.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "は、順次受付します。利用期間は原則7日間です。展示\n作品の盗難・破損については責任を負いません。営利・\n\n至上野　　八坂神社\n\n取手市\n埋蔵文化財センター\n\n小を寿参して",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -105,23 +105,23 @@
       "roi_id": "strip_0013",
       "image": "roi_strips/strip_0013.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "広報宣伝を主目的とした利用はできません。\n\n運動施設",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
     {
       "roi_id": "strip_0014",
       "image": "roi_strips/strip_0014.jpg",
-      "text": "",
-      "candidate_text": "",
+      "text": "使用料 有料\n取手グリーンスポーツセンター",
+      "candidate_text": "使用料 有料",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
     {
       "roi_id": "strip_0015",
       "image": "roi_strips/strip_0015.jpg",
-      "text": "",
-      "candidate_text": "",
+      "text": "とりでアートギャラリー\n\n問合せ 📞 78-9090 　現在市内には\n　　　　　　　　　　　　　　　　　おりれのし",
+      "candidate_text": "とりでアートギャラリー\n\n問合せ 📞 78-9090 　稲市内には\n　　　　　　　　　　　　　　　　　おりれのし",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -129,7 +129,7 @@
       "roi_id": "strip_0016",
       "image": "roi_strips/strip_0016.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "アトレ取手4階たいけん美じゅつ場VIVA内　　　　　　　　　　　総合体育館（第1・2体育室、柔道・剣道場、弓道場、ト　　ーリやレクリ\n　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　さんに親",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -137,7 +137,7 @@
       "roi_id": "strip_0017",
       "image": "roi_strips/strip_0017.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "開館時間 10：00〜19：00（展示により異なります）\n\n休館日 年末年始、館内整理日、アトレ取手休館日\n\nレーニングルーム）、室内プール（公認50m）・遊水プー\nル（夏期のみ）・林間アスレチックを備えた市民スポー\nツの拠点です。",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -145,7 +145,7 @@
       "roi_id": "strip_0018",
       "image": "roi_strips/strip_0018.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "►利用するときは\n　個人でも団体でも利用できます（有料）。申し込みは\n利用日の6カ月前から1カ月前までです。文化芸術課窓\n\n開館時間　9:00〜21:00（受付は20:00まで）\n※トレーニングルーム、室内プールは、22:00（受\n　付は21:00）まで",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -153,7 +153,7 @@
       "roi_id": "strip_0019",
       "image": "roi_strips/strip_0019.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "口で受付します。ギャラリー1、ギャラリー2、ギャラ\nリー3の3部屋あります。利用期間は原則5日間または\n6日間です。展示作品の盗難・破損については責任を負\nいません。営利・広報宣伝を主目的とした利用はできま\nせん。\n\n休館日　月曜日（祝日を除く）、年末年始\n　　　　※遊水プールの開設日は開館します。遊水プールの\n　　　　開設日時についてはお問い合わせください。\n\n予約方法　予約専用電話　☎ 79-1122",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -161,7 +161,7 @@
       "roi_id": "strip_0020",
       "image": "roi_strips/strip_0020.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "・市\n民\n館\n\n使用料 有料\n\n▶団体利用\n　団体登録が必要です。予約受付は利用日の3カ月前",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -169,7 +169,7 @@
       "roi_id": "strip_0021",
       "image": "roi_strips/strip_0021.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "活\n動\n\n■ 埋蔵文化財センター\n\nの同日からとなります。\n・窓口予約　9:00～20:00\n　電話予約　10:00～17:00",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -177,7 +177,7 @@
       "roi_id": "strip_0022",
       "image": "roi_strips/strip_0022.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "問合せ ☎ 73-2010\n\n市内で出土した埋蔵文化財などの郷土資料を保存整\n理し、公開する施設です。資料の閲覧や問い合わせは、\n事前に電話でお申し込みください。また、企画展を行っ\nています。テーマ、開催期間、休館日などは広報紙など\n\n・電話予約　10：00～17：00\n・インターネット予約　3カ月前の2日後から\n\n▶個人利用\n　市民利用カードが必要です。\n※身分証明書が必要となります。詳細は、お問い合わせくだ\nさい。",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     },
@@ -185,7 +185,7 @@
       "roi_id": "strip_0023",
       "image": "roi_strips/strip_0023.jpg",
       "text": "",
-      "candidate_text": "",
+      "candidate_text": "休館日 土・日曜日、祝日、年末年始\n※企画展開催中は変更となります。",
       "status": "needs_labeling",
       "note": "Review the ROI strip image and fill text."
     }
