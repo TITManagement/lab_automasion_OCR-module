@@ -1,25 +1,6 @@
-# AGENTS.md (lab_automation_OCR-module Local)
+# AGENTS.md (lab_automation_OCR-module)
 
-<!-- AGENTS_BASE_SOURCE: ../../AGENTS.md -->
-<!-- AGENTS_BASE_SHA256: local-delta -->
-
-| 項目 | 内容 |
-| --- | --- |
-| 文書ID | `LABOCR-OPS-AGENTS-GUIDE` |
-| 作成日 | `2026-05-03` |
-| 作成者 | `Tinoue` |
-| 最終更新日 | `2026-05-03` |
-| 最終更新者 | `Codex` |
-| 版数 | `v1.0` |
-| 状態 | `運用中` |
-
-このモジュールの共通運用は以下を正本とする（AiLab起点の相対パス）。
-
-- 共通ルール: [../../AGENTS.md](../../AGENTS.md)
-- リポジトリ差分ルール: [../AGENTS.md](../AGENTS.md)
-- README標準: [../../README_STANDARD.md](../../README_STANDARD.md)
-- docstring / comment 規約: [docs/dev/notes/DEVELOPER_GUIDE.md](docs/dev/notes/DEVELOPER_GUIDE.md)
-
+共通ルールは [../../AGENTS.md](../../AGENTS.md) を正本とする。
 このファイルには、`lab_automation_OCR-module` 固有の差分だけを書く。
 
 ## モジュール固有ルール
