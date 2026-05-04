@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "source_image": "IMG_0678.jpg",
+  "source_rois": "rois.json",
+  "source_roi_strips": "roi_strips",
+  "label_status": "needs_human_labeling",
+  "labels": [
+    {
+      "roi_id": "strip_0001",
+      "image": "roi_strips/strip_0001.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0002",
+      "image": "roi_strips/strip_0002.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0003",
+      "image": "roi_strips/strip_0003.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0004",
+      "image": "roi_strips/strip_0004.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0005",
+      "image": "roi_strips/strip_0005.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0006",
+      "image": "roi_strips/strip_0006.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0007",
+      "image": "roi_strips/strip_0007.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0008",
+      "image": "roi_strips/strip_0008.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0009",
+      "image": "roi_strips/strip_0009.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0010",
+      "image": "roi_strips/strip_0010.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0011",
+      "image": "roi_strips/strip_0011.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0012",
+      "image": "roi_strips/strip_0012.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0013",
+      "image": "roi_strips/strip_0013.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0014",
+      "image": "roi_strips/strip_0014.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0015",
+      "image": "roi_strips/strip_0015.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0016",
+      "image": "roi_strips/strip_0016.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0017",
+      "image": "roi_strips/strip_0017.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0018",
+      "image": "roi_strips/strip_0018.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0019",
+      "image": "roi_strips/strip_0019.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0020",
+      "image": "roi_strips/strip_0020.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0021",
+      "image": "roi_strips/strip_0021.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0022",
+      "image": "roi_strips/strip_0022.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    },
+    {
+      "roi_id": "strip_0023",
+      "image": "roi_strips/strip_0023.jpg",
+      "text": "",
+      "candidate_text": "",
+      "status": "needs_labeling",
+      "note": "Review the ROI strip image and fill text."
+    }
+  ]
+}
