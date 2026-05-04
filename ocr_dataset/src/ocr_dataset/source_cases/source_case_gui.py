@@ -253,7 +253,7 @@ class SourceCaseCreatorGui(BaseApp):
     def _build_review_tab(self, tab: ctk.CTkFrame) -> None:
         tab.grid_columnconfigure(0, weight=3)
         tab.grid_columnconfigure(1, weight=2)
-        tab.grid_rowconfigure(1, weight=1)
+        tab.grid_rowconfigure(2, weight=1)
 
         loader = ctk.CTkFrame(tab)
         loader.grid(row=0, column=0, columnspan=2, padx=8, pady=(8, 10), sticky="ew")
@@ -311,8 +311,7 @@ class SourceCaseCreatorGui(BaseApp):
         edit_panel = ctk.CTkFrame(tab)
         edit_panel.grid(row=2, column=1, padx=(6, 8), pady=(0, 8), sticky="nsew")
         edit_panel.grid_columnconfigure(0, weight=1)
-        edit_panel.grid_rowconfigure(3, weight=1)
-        edit_panel.grid_rowconfigure(6, weight=2)
+        edit_panel.grid_rowconfigure(10, weight=1)
 
         top_line = ctk.CTkFrame(edit_panel, fg_color="transparent")
         top_line.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="ew")
@@ -328,8 +327,8 @@ class SourceCaseCreatorGui(BaseApp):
         ctk.CTkButton(nav, text="次へ", command=self._next_review_label, width=90).grid(row=0, column=2, sticky="e")
 
         ctk.CTkLabel(edit_panel, text="candidate_text").grid(row=2, column=0, padx=12, pady=(0, 4), sticky="w")
-        self.candidate_text = ctk.CTkTextbox(edit_panel, wrap="word", height=140)
-        self.candidate_text.grid(row=3, column=0, padx=12, pady=(0, 8), sticky="nsew")
+        self.candidate_text = ctk.CTkTextbox(edit_panel, wrap="word", height=120)
+        self.candidate_text.grid(row=3, column=0, padx=12, pady=(0, 8), sticky="ew")
         self.candidate_text.configure(state="disabled")
 
         ctk.CTkButton(
@@ -341,8 +340,8 @@ class SourceCaseCreatorGui(BaseApp):
         ctk.CTkLabel(edit_panel, text="text（学習に使う確定文字列）").grid(
             row=5, column=0, padx=12, pady=(0, 4), sticky="w"
         )
-        self.label_text = ctk.CTkTextbox(edit_panel, wrap="word", height=180)
-        self.label_text.grid(row=6, column=0, padx=12, pady=(0, 8), sticky="nsew")
+        self.label_text = ctk.CTkTextbox(edit_panel, wrap="word", height=170)
+        self.label_text.grid(row=6, column=0, padx=12, pady=(0, 8), sticky="ew")
 
         status_row = ctk.CTkFrame(edit_panel, fg_color="transparent")
         status_row.grid(row=7, column=0, padx=12, pady=(0, 8), sticky="ew")
