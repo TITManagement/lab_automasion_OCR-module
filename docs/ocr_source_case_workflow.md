@@ -145,6 +145,14 @@ roi_strips/strip_0011.jpg	ギャラリー
 
 今後 `trusted_auto` を導入する場合も、`verified` とは別ファイルに export し、学習時に明示的に混ぜる設計にする。
 
+export は次のコマンドで実行する。
+
+```bash
+python main.py export-paddleocr source_cases/img_0678 --output exports/img_0678
+```
+
+出力先には、PaddleOCR recognition 用の `rec_gt_train.txt`、短冊画像をコピーした `images/`、export 内容を記録する `manifest.json` を作成する。
+
 ## 8. OCR 実行 JSON / ログの用途
 
 `vision_ocr_summary.json` と `vision_ocr.log` は PaddleOCR に直接渡す入力ではない。用途は、OCR 候補生成の再現性、監査、再実行判断、品質確認である。

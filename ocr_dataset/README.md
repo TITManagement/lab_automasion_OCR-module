@@ -220,7 +220,19 @@ lab-ocr-generate-variants source_cases/img_0678
 
 PaddleOCR の認識モデルを学習するには、最終的に PaddleOCR が要求する label file と画像ディレクトリへ変換する必要があります。
 
-この export は今後 [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) に実装します。現時点では境界だけを固定し、誤って未完成の export を学習に使わないよう `NotImplementedError` にしています。
+この export は [src/ocr_dataset/exporters/paddleocr_dataset.py](src/ocr_dataset/exporters/paddleocr_dataset.py) が担当します。`status: verified` の ROI だけを対象にし、`needs_labeling`、`needs_review`、`skipped` は学習用 label file に含めません。
+
+```bash
+lab-ocr-export-paddleocr-dataset source_cases/img_0678 --output exports/img_0678
+```
+
+[../main.py](../main.py) から実行する場合:
+
+```bash
+python main.py export-paddleocr source_cases/img_0678 --output exports/img_0678
+```
+
+出力先には、PaddleOCR recognition 用の `rec_gt_train.txt`、コピー済み短冊画像を含む `images/`、export 内容を確認する `manifest.json` を作成します。`rec_gt_train.txt` は画像相対パスと正解文字列をタブ区切りで保存します。
 
 ### 7. PaddleOCR 側で fine-tuning する
 

@@ -133,6 +133,7 @@ lab-ocr-vision-batch source_cases/img_0678/roi_strips
 lab-ocr-sync-roi-candidates source_cases/img_0678
 lab-ocr-prepare-source-case source_cases/img_0678
 lab-ocr-source-case-gui
+lab-ocr-export-paddleocr-dataset source_cases/img_0678 --output exports/img_0678
 lab-ocr-generate-variants source_cases/img_0678
 ```
 
@@ -151,7 +152,13 @@ lab-ocr-source-case-gui
 
 ROI OCR 候補生成の結果は、`roi_strips/vision_ocr_summary.json` と `roi_strips/vision_ocr.log` に保存します。候補 `.txt` は `roi_labels.json` の `candidate_text` にも同期します。これらは PaddleOCR へ直接渡す学習入力ではなく、候補生成の再現性、監査、再実行判断、品質確認に使う情報です。
 
-PaddleOCR へ最終的に渡す recognition dataset は、`roi_labels.json` で人が確認し `verified` にした ROI ラベルから export します。Vision OCR の `.txt` 候補や `candidate_text` を未確認のまま学習に使ってはいけません。詳細は [docs/ocr_source_case_workflow.md](docs/ocr_source_case_workflow.md) を参照してください。
+PaddleOCR へ最終的に渡す recognition dataset は、`roi_labels.json` で人が確認し `verified` にした ROI ラベルから export します。Vision OCR の `.txt` 候補や `candidate_text` を未確認のまま学習に使ってはいけません。`main.py` から実行する場合は次を使います。
+
+```bash
+python main.py export-paddleocr source_cases/img_0678 --output exports/img_0678
+```
+
+詳細は [docs/ocr_source_case_workflow.md](docs/ocr_source_case_workflow.md) を参照してください。
 
 ## 構成
 
