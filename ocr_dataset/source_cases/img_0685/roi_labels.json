@@ -30,7 +30,7 @@
       "image": "roi_strips/strip_0003.jpg",
       "text": "この画像には日本語テキストは含まれていません。英語で「**SENTIA**」と書かれています。",
       "candidate_text": "この画像には日本語テキストは含まれていません。英語で「**SENTIA**」と書かれています。",
-      "status": "verified",
+      "status": "skipped",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0003.txt"
@@ -60,7 +60,7 @@
       "image": "roi_strips/strip_0006.jpg",
       "text": "画像には判読可能な日本語テキストが確認できません。画像は非常に暗く、ほぼ無地に見えます。",
       "candidate_text": "画像には判読可能な日本語テキストが確認できません。画像は非常に暗く、ほぼ無地に見えます。",
-      "status": "verified",
+      "status": "skipped",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0006.txt"
