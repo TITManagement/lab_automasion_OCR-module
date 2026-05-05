@@ -8,9 +8,9 @@
     {
       "roi_id": "strip_0001",
       "image": "roi_strips/strip_0001.jpg",
-      "text": "",
+      "text": "この画像には判読できる日本語テキストは確認できません。画像は非常に細長く、刃物（刀や包丁など）の刃の部分のクローズアップのように見えます。",
       "candidate_text": "この画像には判読できる日本語テキストは確認できません。画像は非常に細長く、刃物（刀や包丁など）の刃の部分のクローズアップのように見えます。",
-      "status": "needs_labeling",
+      "status": "skipped",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0001.txt"
@@ -18,9 +18,9 @@
     {
       "roi_id": "strip_0002",
       "image": "roi_strips/strip_0002.jpg",
-      "text": "",
+      "text": "この画像には日本語テキストは含まれていません。英字（ラテン文字）のテキストが写っています。",
       "candidate_text": "この画像には日本語テキストは含まれていません。英字（ラテン文字）のテキストが写っています。",
-      "status": "needs_labeling",
+      "status": "skipped",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0002.txt"
@@ -28,9 +28,9 @@
     {
       "roi_id": "strip_0003",
       "image": "roi_strips/strip_0003.jpg",
-      "text": "",
+      "text": "この画像には日本語テキストは含まれていません。英語で「**SENTIA**」と書かれています。",
       "candidate_text": "この画像には日本語テキストは含まれていません。英語で「**SENTIA**」と書かれています。",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0003.txt"
@@ -38,9 +38,9 @@
     {
       "roi_id": "strip_0004",
       "image": "roi_strips/strip_0004.jpg",
-      "text": "",
+      "text": "この画像には判読できる日本語テキストは含まれていません。",
       "candidate_text": "この画像には判読できる日本語テキストは含まれていません。",
-      "status": "needs_labeling",
+      "status": "skipped",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0004.txt"
@@ -48,9 +48,9 @@
     {
       "roi_id": "strip_0005",
       "image": "roi_strips/strip_0005.jpg",
-      "text": "",
+      "text": "IQOS ILUMA 専用",
       "candidate_text": "IQOS ILUMA 専用",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0005.txt"
@@ -58,9 +58,9 @@
     {
       "roi_id": "strip_0006",
       "image": "roi_strips/strip_0006.jpg",
-      "text": "",
+      "text": "画像には判読可能な日本語テキストが確認できません。画像は非常に暗く、ほぼ無地に見えます。",
       "candidate_text": "画像には判読可能な日本語テキストが確認できません。画像は非常に暗く、ほぼ無地に見えます。",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0006.txt"
@@ -68,9 +68,9 @@
     {
       "roi_id": "strip_0007",
       "image": "roi_strips/strip_0007.jpg",
-      "text": "",
+      "text": "望まない受動喫煙が生じないよう、屋外や家庭",
       "candidate_text": "望まない受動喫煙が生じないよう、屋外や家庭",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0007.txt"
@@ -78,9 +78,9 @@
     {
       "roi_id": "strip_0008",
       "image": "roi_strips/strip_0008.jpg",
-      "text": "",
+      "text": "でも周囲の状況に配慮することが、健康増進法",
       "candidate_text": "でも周囲の状況に配慮することが、健康増進法",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0008.txt"
@@ -88,9 +88,9 @@
     {
       "roi_id": "strip_0009",
       "image": "roi_strips/strip_0009.jpg",
-      "text": "",
+      "text": "上、義務付けられています。",
       "candidate_text": "上、義務付けられています。",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0009.txt"
@@ -98,9 +98,9 @@
     {
       "roi_id": "strip_0010",
       "image": "roi_strips/strip_0010.jpg",
-      "text": "",
+      "text": "「CLEAR」の表現は、健康への悪影響が他製品より小さいことを意味するものではありません。",
       "candidate_text": "「CLEAR」の表現は、健康への悪影響が他製品より小さいことを意味するものではありません。",
-      "status": "needs_labeling",
+      "status": "verified",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0010.txt"
@@ -108,9 +108,9 @@
     {
       "roi_id": "strip_0011",
       "image": "roi_strips/strip_0011.jpg",
-      "text": "",
+      "text": "画像は非常に暗く、細長い帯状の画像で、日本語テキストを明確に読み取ることができません。\n\nテキストが含まれている可能性はありますが、画像の解像度と明るさの問題により、判読不能です。",
       "candidate_text": "画像は非常に暗く、細長い帯状の画像で、日本語テキストを明確に読み取ることができません。\n\nテキストが含まれている可能性はありますが、画像の解像度と明るさの問題により、判読不能です。",
-      "status": "needs_labeling",
+      "status": "skipped",
       "note": "Review the ROI strip image and fill text.",
       "candidate_source": "vision_ocr",
       "candidate_file": "roi_strips/strip_0011.txt"
