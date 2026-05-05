@@ -18,9 +18,19 @@ def main() -> int:
     camera_gui_app = module_root / "ocr_wrapper" / "src" / "ocr_wrapper" / "camera_ocr_gui.py"
     paddle_python = module_root / ".venv_OCR" / "bin" / "python"
 
-    if not wrapper.exists():
-        print(f"[ERROR] wrapper not found: {wrapper}", file=sys.stderr)
-        return 2
+    if len(sys.argv) > 1 and sys.argv[1] == "source-case-gui":
+        if not paddle_python.exists():
+            print(f"[ERROR] python runtime not found: {paddle_python}", file=sys.stderr)
+            return 2
+        cmd = [str(paddle_python), "-m", "ocr_dataset.source_cases.source_case_gui", *sys.argv[2:]]
+        return subprocess.run(cmd).returncode
+
+    if len(sys.argv) > 1 and sys.argv[1] == "export-paddleocr":
+        if not paddle_python.exists():
+            print(f"[ERROR] python runtime not found: {paddle_python}", file=sys.stderr)
+            return 2
+        cmd = [str(paddle_python), "-m", "ocr_dataset.exporters.paddleocr_dataset", *sys.argv[2:]]
+        return subprocess.run(cmd).returncode
 
     if len(sys.argv) > 1 and sys.argv[1] == "camera-ocr":
         if not camera_app.exists():
@@ -41,6 +51,10 @@ def main() -> int:
             return 2
         cmd = [str(paddle_python), str(camera_gui_app), *sys.argv[2:]]
         return subprocess.run(cmd).returncode
+
+    if not wrapper.exists():
+        print(f"[ERROR] wrapper not found: {wrapper}", file=sys.stderr)
+        return 2
 
     cmd = ["bash", str(wrapper), *sys.argv[1:]]
     return subprocess.run(cmd).returncode

@@ -43,6 +43,7 @@ lab-ocr-vision-batch = "ocr_dataset.source_cases.vision_batch_ocr:main"
 lab-ocr-sync-roi-candidates = "ocr_dataset.source_cases.sync_roi_candidates:main"
 lab-ocr-prepare-source-case = "ocr_dataset.source_cases.prepare_source_case:main"
 lab-ocr-source-case-gui = "ocr_dataset.source_cases.source_case_gui:main"
+lab-ocr-export-paddleocr-dataset = "ocr_dataset.exporters.paddleocr_dataset:main"
 
 [tool.setuptools.packages.find]
 where = ["ocr_wrapper/src", "ocr_synthetic_data/src", "ocr_dataset/src"]
