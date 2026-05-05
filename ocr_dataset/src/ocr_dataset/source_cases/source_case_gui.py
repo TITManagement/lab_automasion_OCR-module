@@ -37,6 +37,21 @@ from ocr_dataset.source_cases.vision_batch_ocr import (
     process_roi_strips,
 )
 
+STATUS_TO_LABEL = {
+    "needs_labeling": "未確認",
+    "needs_review": "保留",
+    "verified": "学習に使う",
+    "skipped": "使わない",
+}
+LABEL_TO_STATUS = {label: status for status, label in STATUS_TO_LABEL.items()}
+STATUS_LABELS = list(STATUS_TO_LABEL.values())
+STATUS_HELP = {
+    "needs_labeling": "未確認のままです。見終えたら判定を選んで保存します。",
+    "needs_review": "保存すると保留として残ります。あとで再確認します。",
+    "verified": "保存すると学習対象になります。text が正しいことを確認してください。",
+    "skipped": "保存すると学習対象から外します。",
+}
+
 
 def _friendly_prepare_error(message: str) -> str:
     if "source image already exists:" in message:
@@ -86,7 +101,9 @@ class SourceCaseCreatorGui(BaseApp):
         self.vision_model = ctk.StringVar(value=DEFAULT_MODEL)
         self.review_case_dir = ctk.StringVar()
         self.review_progress = ctk.StringVar(value="未読込")
-        self.review_status = ctk.StringVar(value="needs_labeling")
+        self.review_status = ctk.StringVar(value=STATUS_TO_LABEL["needs_labeling"])
+        self.review_status_help = ctk.StringVar(value=STATUS_HELP["needs_labeling"])
+        self.review_guide_visible = ctk.BooleanVar(value=False)
         self._queue: queue.Queue[tuple[str, object]] = queue.Queue()
         self._worker: threading.Thread | None = None
         self._result_link_paths: dict[str, Path] = {}
@@ -258,31 +275,36 @@ class SourceCaseCreatorGui(BaseApp):
         loader = ctk.CTkFrame(tab)
         loader.grid(row=0, column=0, columnspan=2, padx=8, pady=(8, 10), sticky="ew")
         loader.grid_columnconfigure(1, weight=1)
-        ctk.CTkLabel(loader, text="確認するcaseフォルダ").grid(row=0, column=0, padx=12, pady=(12, 4), sticky="w")
-        ctk.CTkEntry(loader, textvariable=self.review_case_dir).grid(row=0, column=1, padx=8, pady=12, sticky="ew")
+        ctk.CTkLabel(loader, text="caseフォルダ（roi_labels.json / roi_strips）").grid(
+            row=0, column=0, padx=12, pady=10, sticky="w"
+        )
+        ctk.CTkEntry(loader, textvariable=self.review_case_dir).grid(row=0, column=1, padx=8, pady=10, sticky="ew")
         ctk.CTkButton(loader, text="caseフォルダ選択", command=self._select_review_case, width=130).grid(
-            row=0, column=2, padx=(8, 4), pady=12
+            row=0, column=2, padx=(8, 4), pady=10
         )
         ctk.CTkButton(loader, text="読込", command=self._load_review_case, width=90).grid(
-            row=0, column=3, padx=(4, 12), pady=12
+            row=0, column=3, padx=(4, 12), pady=10
         )
-        ctk.CTkLabel(
-            loader,
-            text="例: ocr_dataset/source_cases/img_0678。roi_labels.json と roi_strips を含むフォルダを選びます。",
-            text_color="#555555",
-            wraplength=820,
-            justify="left",
-        ).grid(row=1, column=1, columnspan=3, padx=8, pady=(0, 10), sticky="w")
 
         guide = ctk.CTkFrame(tab)
-        guide.grid(row=1, column=0, columnspan=2, padx=8, pady=(0, 10), sticky="ew")
+        guide.grid(row=1, column=0, columnspan=2, padx=8, pady=(0, 8), sticky="ew")
         guide.grid_columnconfigure(0, weight=1)
+        guide_header = ctk.CTkFrame(guide, fg_color="transparent")
+        guide_header.grid(row=0, column=0, padx=12, pady=8, sticky="w")
         ctk.CTkLabel(
-            guide,
+            guide_header,
             text="ラベル入力の考え方",
             font=ctk.CTkFont(weight="bold"),
-        ).grid(row=0, column=0, padx=12, pady=(10, 2), sticky="w")
-        ctk.CTkLabel(
+        ).grid(row=0, column=0, sticky="w")
+        self.review_guide_button = ctk.CTkButton(
+            guide_header,
+            text="表示",
+            width=72,
+            command=self._toggle_review_guide,
+        )
+        self.review_guide_button.grid(row=0, column=1, padx=(10, 0), sticky="w")
+
+        self.review_guide_detail = ctk.CTkLabel(
             guide,
             text=(
                 "text には、この短冊画像をOCRしたときに返ってほしい正解文字列を入れます。"
@@ -294,7 +316,7 @@ class SourceCaseCreatorGui(BaseApp):
             ),
             wraplength=1040,
             justify="left",
-        ).grid(row=1, column=0, padx=12, pady=(0, 10), sticky="ew")
+        )
 
         image_panel = ctk.CTkFrame(tab)
         image_panel.grid(row=2, column=0, padx=(8, 6), pady=(0, 8), sticky="nsew")
@@ -311,7 +333,7 @@ class SourceCaseCreatorGui(BaseApp):
         edit_panel = ctk.CTkFrame(tab)
         edit_panel.grid(row=2, column=1, padx=(6, 8), pady=(0, 8), sticky="nsew")
         edit_panel.grid_columnconfigure(0, weight=1)
-        edit_panel.grid_rowconfigure(10, weight=1)
+        edit_panel.grid_rowconfigure(6, weight=1)
 
         top_line = ctk.CTkFrame(edit_panel, fg_color="transparent")
         top_line.grid(row=0, column=0, padx=12, pady=(12, 6), sticky="ew")
@@ -327,7 +349,7 @@ class SourceCaseCreatorGui(BaseApp):
         ctk.CTkButton(nav, text="次へ", command=self._next_review_label, width=90).grid(row=0, column=2, sticky="e")
 
         ctk.CTkLabel(edit_panel, text="candidate_text").grid(row=2, column=0, padx=12, pady=(0, 4), sticky="w")
-        self.candidate_text = ctk.CTkTextbox(edit_panel, wrap="word", height=120)
+        self.candidate_text = ctk.CTkTextbox(edit_panel, wrap="word", height=105)
         self.candidate_text.grid(row=3, column=0, padx=12, pady=(0, 8), sticky="ew")
         self.candidate_text.configure(state="disabled")
 
@@ -340,24 +362,22 @@ class SourceCaseCreatorGui(BaseApp):
         ctk.CTkLabel(edit_panel, text="text（学習に使う確定文字列）").grid(
             row=5, column=0, padx=12, pady=(0, 4), sticky="w"
         )
-        self.label_text = ctk.CTkTextbox(edit_panel, wrap="word", height=170)
-        self.label_text.grid(row=6, column=0, padx=12, pady=(0, 8), sticky="ew")
+        self.label_text = ctk.CTkTextbox(edit_panel, wrap="word", height=145)
+        self.label_text.grid(row=6, column=0, padx=12, pady=(0, 8), sticky="nsew")
 
         status_row = ctk.CTkFrame(edit_panel, fg_color="transparent")
         status_row.grid(row=7, column=0, padx=12, pady=(0, 8), sticky="ew")
         status_row.grid_columnconfigure(1, weight=1)
-        ctk.CTkLabel(status_row, text="status").grid(row=0, column=0, sticky="w")
+        ctk.CTkLabel(status_row, text="ROI判定").grid(row=0, column=0, sticky="w")
         ctk.CTkOptionMenu(
             status_row,
             variable=self.review_status,
-            values=["needs_labeling", "needs_review", "verified", "skipped"],
+            values=STATUS_LABELS,
+            command=lambda _choice: self._update_review_status_help(),
         ).grid(row=0, column=1, padx=(8, 0), sticky="ew")
         ctk.CTkLabel(
             edit_panel,
-            text=(
-                "status: needs_labeling=未確認、needs_review=判断保留、"
-                "verified=画像と照合済みで学習対象、skipped=学習に使わない"
-            ),
+            textvariable=self.review_status_help,
             text_color="#555555",
             wraplength=430,
             justify="left",
@@ -370,9 +390,22 @@ class SourceCaseCreatorGui(BaseApp):
         ctk.CTkButton(actions, text="保存", command=self._save_current_review_label).grid(
             row=0, column=0, padx=(0, 4), sticky="ew"
         )
-        ctk.CTkButton(actions, text="保存して次へ", command=self._save_and_next_review_label).grid(
-            row=0, column=1, padx=(4, 0), sticky="ew"
+        self.save_next_button = ctk.CTkButton(
+            actions,
+            text="保存して次へ",
+            command=self._save_and_next_review_label,
         )
+        self.save_next_button.grid(row=0, column=1, padx=(4, 0), sticky="ew")
+
+    def _toggle_review_guide(self) -> None:
+        visible = not self.review_guide_visible.get()
+        self.review_guide_visible.set(visible)
+        if visible:
+            self.review_guide_detail.grid(row=1, column=0, padx=12, pady=(0, 10), sticky="ew")
+            self.review_guide_button.configure(text="非表示")
+        else:
+            self.review_guide_detail.grid_remove()
+            self.review_guide_button.configure(text="表示")
 
     def _change_vision_provider(self, provider: str) -> None:
         values = OPENAI_MODELS if provider == PROVIDER_OPENAI else ANTHROPIC_MODELS
@@ -425,7 +458,9 @@ class SourceCaseCreatorGui(BaseApp):
             self.roi_image_label.configure(image=None, text="ROI label がありません")
             self._set_textbox_text(self.candidate_text, "", disabled=True)
             self._set_textbox_text(self.label_text, "")
-            self.review_status.set("needs_labeling")
+            self.review_status.set(STATUS_TO_LABEL["needs_labeling"])
+            self._update_review_status_help()
+            self.save_next_button.configure(text="保存して次へ")
             return
 
         label = self._review_labels[self._review_index]
@@ -441,10 +476,12 @@ class SourceCaseCreatorGui(BaseApp):
 
         self.roi_id_label.configure(text=roi_id)
         self.review_progress.set(self._review_progress_text())
-        self.review_status.set(status)
+        self.review_status.set(STATUS_TO_LABEL[status])
+        self._update_review_status_help()
         self._set_textbox_text(self.candidate_text, candidate, disabled=True)
         self._set_textbox_text(self.label_text, text)
         self._render_roi_image(Path(self.review_case_dir.get()) / image_rel)
+        self.save_next_button.configure(text="保存して完了" if self._is_last_review_label() else "保存して次へ")
 
     def _render_roi_image(self, image_path: Path) -> None:
         if not image_path.exists():
@@ -471,8 +508,35 @@ class SourceCaseCreatorGui(BaseApp):
 
     def _review_progress_text(self) -> str:
         total = len(self._review_labels)
-        verified = sum(1 for label in self._review_labels if label.get("status") == "verified")
-        return f"{self._review_index + 1}/{total}  verified {verified}/{total}"
+        counts = {
+            "needs_labeling": 0,
+            "needs_review": 0,
+            "verified": 0,
+            "skipped": 0,
+        }
+        for label in self._review_labels:
+            status = str(label.get("status", "needs_labeling"))
+            counts[status if status in counts else "needs_labeling"] += 1
+        decided = counts["verified"] + counts["skipped"]
+        return (
+            f"{self._review_index + 1}/{total}  判定済 {decided}/{total}"
+            f"（採用{counts['verified']}・除外{counts['skipped']}・"
+            f"未{counts['needs_labeling']}・保{counts['needs_review']}）"
+        )
+
+    def _is_last_review_label(self) -> bool:
+        return bool(self._review_labels) and self._review_index >= len(self._review_labels) - 1
+
+    def _selected_review_status(self) -> str:
+        selected = self.review_status.get()
+        if selected in LABEL_TO_STATUS:
+            return LABEL_TO_STATUS[selected]
+        if selected in STATUS_TO_LABEL:
+            return selected
+        return "needs_labeling"
+
+    def _update_review_status_help(self) -> None:
+        self.review_status_help.set(STATUS_HELP[self._selected_review_status()])
 
     def _copy_candidate_to_text(self) -> None:
         if not self._review_labels:
@@ -499,16 +563,16 @@ class SourceCaseCreatorGui(BaseApp):
             return
         label = self._review_labels[self._review_index]
         label["text"] = self.label_text.get("1.0", "end").strip()
-        label["status"] = self.review_status.get()
+        label["status"] = self._selected_review_status()
 
     def _save_current_review_label(self) -> bool:
         if not self._review_labels or self._review_doc is None:
             messagebox.showerror("保存失敗", "保存する ROI label が読み込まれていません。")
             return False
-        if self.review_status.get() == "verified" and not self.label_text.get("1.0", "end").strip():
+        if self._selected_review_status() == "verified" and not self.label_text.get("1.0", "end").strip():
             messagebox.showerror(
                 "保存失敗",
-                "status を verified にする場合は、text（学習に使う確定文字列）を入力してください。",
+                "ROI判定を「学習に使う」にする場合は、text（学習に使う確定文字列）を入力してください。",
             )
             return False
         self._store_current_review_label()
@@ -525,8 +589,25 @@ class SourceCaseCreatorGui(BaseApp):
         return True
 
     def _save_and_next_review_label(self) -> None:
-        if self._save_current_review_label():
-            self._next_review_label()
+        if not self._save_current_review_label():
+            return
+        if self._is_last_review_label():
+            self._show_review_complete_message()
+            return
+        self._next_review_label()
+
+    def _show_review_complete_message(self) -> None:
+        messagebox.showinfo(
+            "ROI確認完了",
+            (
+                "ROI確認を最後まで保存しました。\n\n"
+                "次に確認してください:\n"
+                "- verified 件数\n"
+                "- needs_labeling / needs_review の残り\n"
+                "- roi_labels.json の text\n\n"
+                "verified のROIだけが学習対象です。"
+            ),
+        )
 
     def _select_image(self) -> None:
         path = filedialog.askopenfilename(
