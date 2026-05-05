@@ -16,6 +16,8 @@
 
 source case は、PaddleOCR の fine-tuning に直接渡す最終データではなく、学習データを作るための元資産である。元画像、全文正解テキスト、ROI 短冊、OCR 候補、レビュー状態を分けて保持し、最終的には人が確認した ROI ラベルだけを PaddleOCR 形式へ export する。
 
+`main.py` を入口にした OCR 実行系、PaddleOCR 学習、学習結果まで含む上位のデータフローは [ocr_accuracy_data_flow.md](ocr_accuracy_data_flow.md) を参照する。
+
 ## 2. 対象者
 
 - OCR 学習用データを作成する使用者

@@ -14,6 +14,8 @@
 
 この設計書は、`lab_automation_OCR-module` で PaddleOCR を支援するために外側レイヤーへ追加したアルゴリズムを整理する。
 
+`main.py`、`lab-ocr-source-case-gui`、PaddleOCR export、学習結果までをまたぐ認識精度向上のデータフローは [ocr_accuracy_data_flow.md](ocr_accuracy_data_flow.md) を参照する。
+
 本モジュールでは、PaddleOCR 本体を直接変更せず、以下の支援処理でカメラOCRの実用性を上げる。
 
 - 入力画像の ROI 切り出し
